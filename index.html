@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agencia IA — Roadmap 90 días</title>
+<style>
+  :root{
+    --bg:#0b0d12;
+    --bg-elev:#12151c;
+    --bg-card:#161a23;
+    --bg-card-hover:#1c212c;
+    --border:#252b38;
+    --text:#e9ecf3;
+    --text-dim:#9aa3b5;
+    --text-faint:#6b7280;
+    --accent:#7c5cff;
+    --accent-2:#3ddc97;
+    --accent-warn:#ffb648;
+    --accent-danger:#ff5c7a;
+    --radius:14px;
+    --shadow: 0 8px 24px rgba(0,0,0,.35);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  }
+  :root[data-theme="light"]{
+    --bg:#f4f5f9;
+    --bg-elev:#ffffff;
+    --bg-card:#ffffff;
+    --bg-card-hover:#f0f1f7;
+    --border:#e3e5ee;
+    --text:#151823;
+    --text-dim:#5b6172;
+    --text-faint:#8991a3;
+    --shadow: 0 8px 24px rgba(20,20,40,.08);
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f4f5f9;
+      --bg-elev:#ffffff;
+      --bg-card:#ffffff;
+      --bg-card-hover:#f0f1f7;
+      --border:#e3e5ee;
+      --text:#151823;
+      --text-dim:#5b6172;
+      --text-faint:#8991a3;
+      --shadow: 0 8px 24px rgba(20,20,40,.08);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);}
+  body{min-height:100vh;}
+  a{color:inherit;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+
+  .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh;}
+  @media (max-width: 900px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:sticky;top:0;z-index:50;}
+  }
+
+  /* SIDEBAR */
+  .sidebar{
+    background:var(--bg-elev);
+    border-right:1px solid var(--border);
+    padding:20px 16px;
+    display:flex;flex-direction:column;gap:18px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  @media (max-width:900px){ .sidebar{height:auto;} }
+  .brand{display:flex;align-items:center;gap:10px;padding:4px 4px 6px;}
+  .brand .logo{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#4b7bff);
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+  }
+  .brand .title{font-weight:700;font-size:15px;line-height:1.2;}
+  .brand .sub{font-size:11px;color:var(--text-faint);}
+
+  .ring-wrap{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;display:flex;align-items:center;gap:14px;
+  }
+  .ring{position:relative;width:64px;height:64px;flex-shrink:0;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .pct{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:14px;
+  }
+  .ring-info .label{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em;}
+  .ring-info .value{font-size:13px;color:var(--text-dim);margin-top:2px;}
+
+  nav.navlist{display:flex;flex-direction:column;gap:2px;}
+  nav.navlist .navlink{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:10px;font-size:13.5px;color:var(--text-dim);
+    cursor:pointer;text-decoration:none;transition:background .15s,color .15s;
+    border:1px solid transparent;
+  }
+  nav.navlist .navlink:hover{background:var(--bg-card-hover);color:var(--text);}
+  nav.navlist .navlink.active{background:rgba(124,92,255,.14);color:var(--text);border-color:rgba(124,92,255,.35);}
+  nav.navlist .navlink .ic{width:18px;text-align:center;flex-shrink:0;}
+  nav.navlist .navlink .badge{
+    margin-left:auto;font-size:10.5px;color:var(--text-faint);
+    background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:1px 7px;
+  }
+  nav.navlist .navlink.done .badge{color:var(--accent-2);border-color:rgba(61,220,151,.4);}
+
+  .side-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 12px;border-radius:10px;border:1px solid var(--border);
+    background:var(--bg-card);color:var(--text);font-size:12.5px;cursor:pointer;
+    transition:background .15s,border-color .15s;
+  }
+  .btn:hover{background:var(--bg-card-hover);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{filter:brightness(1.08);}
+  .btn.small{padding:6px 9px;font-size:11.5px;}
+  .btn.danger{color:var(--accent-danger);}
+  .row2{display:flex;gap:8px;}
+  .row2 .btn{flex:1;}
+
+  /* MAIN */
+  main{padding:28px 32px 80px;max-width:920px;margin:0 auto;width:100%;}
+  @media (max-width:600px){ main{padding:18px 14px 60px;} }
+
+  .hero{
+    background:linear-gradient(135deg, rgba(124,92,255,.16), rgba(61,220,151,.08));
+    border:1px solid var(--border);border-radius:18px;padding:22px 24px;margin-bottom:26px;
+    display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center;
+  }
+  .hero h1{margin:0 0 4px;font-size:20px;}
+  .hero p{margin:0;color:var(--text-dim);font-size:13.5px;}
+  .hero-stats{display:flex;gap:22px;flex-wrap:wrap;}
+  .hero-stat .num{font-size:22px;font-weight:800;}
+  .hero-stat .lbl{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em;}
+
+  section.phase{scroll-margin-top:20px;margin-bottom:34px;}
+  .phase-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+  .phase-head h2{font-size:18px;margin:0;display:flex;align-items:center;gap:10px;}
+  .phase-head h2 .em{font-size:20px;}
+  .phase-progress{display:flex;align-items:center;gap:8px;min-width:160px;}
+  .bar{flex:1;height:8px;border-radius:20px;background:var(--border);overflow:hidden;min-width:90px;}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:20px;transition:width .3s;}
+  .phase-progress span{font-size:11.5px;color:var(--text-faint);white-space:nowrap;}
+
+  .card{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow);
+  }
+  .card h3{margin:0 0 8px;font-size:14.5px;}
+  .card .prose{color:var(--text-dim);font-size:13.5px;line-height:1.6;}
+  .card .prose p{margin:.4em 0;}
+  .card .prose strong{color:var(--text);}
+  .card .prose em{color:var(--accent-2);font-style:normal;}
+
+  table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
+  table.tbl th, table.tbl td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top;}
+  table.tbl th{background:var(--bg-elev);color:var(--text-dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;}
+  table.tbl td{color:var(--text-dim);}
+  table.tbl td strong{color:var(--text);}
+  .tbl-wrap{overflow-x:auto;}
+
+  .checklist{display:flex;flex-direction:column;gap:2px;margin-top:6px;}
+  .chk{
+    display:flex;align-items:flex-start;gap:10px;padding:10px 8px;border-radius:10px;cursor:pointer;
+    transition:background .12s;
+  }
+  .chk:hover{background:var(--bg-card-hover);}
+  .chk input{
+    appearance:none;-webkit-appearance:none;width:19px;height:19px;border-radius:6px;
+    border:1.6px solid var(--border);background:var(--bg-elev);flex-shrink:0;margin-top:1px;
+    cursor:pointer;position:relative;transition:.15s;
+  }
+  .chk input:checked{background:var(--accent-2);border-color:var(--accent-2);}
+  .chk input:checked::after{
+    content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;
+    border:solid #0b0d12;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .chk .txt{font-size:13.5px;line-height:1.45;}
+  .chk.checked .txt{color:var(--text-faint);text-decoration:line-through;}
+  .chk .txt small{display:block;color:var(--text-faint);font-size:11.5px;text-decoration:none;margin-top:2px;}
+
+  .deliverable-tag{
+    display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--accent-warn);
+    background:rgba(255,182,72,.12);border:1px solid rgba(255,182,72,.3);
+    padding:2px 8px;border-radius:20px;margin-left:8px;text-transform:uppercase;letter-spacing:.03em;
+  }
+
+  .notes-toggle{font-size:11.5px;color:var(--text-faint);cursor:pointer;margin-top:10px;display:inline-block;}
+  textarea.notes{
+    width:100%;min-height:70px;margin-top:8px;background:var(--bg-elev);border:1px solid var(--border);
+    border-radius:10px;color:var(--text);padding:10px;font-size:13px;font-family:inherit;resize:vertical;
+  }
+
+  .week-block{border-left:2px solid var(--border);padding-left:16px;margin-bottom:18px;position:relative;}
+  .week-block::before{
+    content:"";position:absolute;left:-6px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--border);
+  }
+  .week-block.done::before{background:var(--accent-2);}
+  .week-title{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+  .week-sub{font-size:11.5px;color:var(--text-faint);margin-bottom:8px;}
+
+  .badge-pill{
+    display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+    padding:3px 10px;border-radius:20px;background:rgba(61,220,151,.14);color:var(--accent-2);
+    border:1px solid rgba(61,220,151,.3);
+  }
+
+  .today-grid{display:flex;flex-direction:column;gap:10px;}
+  .today-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;padding:12px 14px;
+  }
+  .today-item .t{font-size:13.5px;}
+  .today-item .t small{display:block;color:var(--text-faint);font-size:11px;font-weight:400;}
+  .toggle{
+    width:42px;height:24px;border-radius:20px;background:var(--border);position:relative;cursor:pointer;flex-shrink:0;
+    transition:.15s;
+  }
+  .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text-dim);transition:.15s;}
+  .toggle.on{background:var(--accent-2);}
+  .toggle.on::after{left:21px;background:#0b0d12;}
+
+  .video-week{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .video-day{
+    width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--bg-elev);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-faint);cursor:pointer;
+    flex-direction:column;gap:1px;
+  }
+  .video-day .d{font-size:9px;}
+  .video-day.on{background:rgba(61,220,151,.18);border-color:var(--accent-2);color:var(--accent-2);}
+  .video-day.today{outline:1.5px solid var(--accent);outline-offset:1px;}
+
+  .checkpoint-card{display:flex;gap:14px;align-items:flex-start;}
+  .checkpoint-card .cp-day{
+    min-width:64px;text-align:center;background:var(--bg-elev);border:1px solid var(--border);
+    border-radius:12px;padding:10px 6px;flex-shrink:0;
+  }
+  .checkpoint-card .cp-day .n{font-size:20px;font-weight:800;}
+  .checkpoint-card .cp-day .l{font-size:9.5px;color:var(--text-faint);text-transform:uppercase;}
+  .checkpoint-card .cp-day .date{font-size:10px;color:var(--text-dim);margin-top:4px;}
+
+  .error-item{border-left:3px solid var(--accent-danger);padding:10px 14px;background:var(--bg-elev);border-radius:0 10px 10px 0;margin-bottom:8px;}
+  .error-item .num{color:var(--accent-danger);font-weight:800;font-size:12px;margin-right:6px;}
+  .error-item .fix{color:var(--accent-2);font-size:12.5px;margin-top:4px;}
+
+  .settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .settings-row:last-child{border-bottom:none;}
+  .settings-row label{font-size:13px;}
+  .settings-row .desc{font-size:11.5px;color:var(--text-faint);margin-top:2px;}
+  input[type="date"]{
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;color:var(--text);
+    padding:7px 10px;font-family:inherit;font-size:13px;
+  }
+
+  .empty-hint{font-size:12px;color:var(--text-faint);text-align:center;padding:16px;}
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--bg-elev);border:1px solid var(--border);color:var(--text);
+    padding:10px 18px;border-radius:10px;font-size:13px;box-shadow:var(--shadow);
+    opacity:0;pointer-events:none;transition:.25s;z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .fine{font-size:11.5px;color:var(--text-faint);line-height:1.5;}
+  hr.sep{border:none;border-top:1px solid var(--border);margin:22px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">🚀</div>
+      <div>
+        <div class="title">Agencia IA</div>
+        <div class="sub">Roadmap 90 días</div>
+      </div>
+    </div>
+
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="64" height="64">
+          <circle cx="32" cy="32" r="27" stroke="var(--border)" stroke-width="7" fill="none"></circle>
+          <circle id="ringProgress" cx="32" cy="32" r="27" stroke="var(--accent-2)" stroke-width="7" fill="none"
+            stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"></circle>
+        </svg>
+        <div class="pct" id="ringPct">0%</div>
+      </div>
+      <div class="ring-info">
+        <div class="label">Progreso total</div>
+        <div class="value" id="ringValue">0 / 0 tareas</div>
+      </div>
+    </div>
+
+    <nav class="navlist" id="navlist">
+      <a class="navlink" data-target="dashboard"><span class="ic">📊</span> Dashboard</a>
+      <a class="navlink" data-target="hoy"><span class="ic">✅</span> Hoy <span class="badge" id="navHoy"></span></a>
+      <a class="navlink" data-target="fase0"><span class="ic">🚦</span> Fase 0 <span class="badge" id="navf0"></span></a>
+      <a class="navlink" data-target="fase1"><span class="ic">🎯</span> Fase 1 <span class="badge" id="navf1"></span></a>
+      <a class="navlink" data-target="fase2"><span class="ic">🛠️</span> Fase 2 <span class="badge" id="navf2"></span></a>
+      <a class="navlink" data-target="fase3"><span class="ic">🤝</span> Fase 3 <span class="badge" id="navf3"></span></a>
+      <a class="navlink" data-target="checkpoints"><span class="ic">🏁</span> Checkpoints</a>
+      <a class="navlink" data-target="errores"><span class="ic">⚠️</span> Errores <span class="badge" id="naverr"></span></a>
+      <a class="navlink" data-target="final"><span class="ic">💶</span> Antes de cobrar <span class="badge" id="navfinal"></span></a>
+      <a class="navlink" data-target="ajustes"><span class="ic">⚙️</span> Ajustes</a>
+    </nav>
+
+    <div class="side-footer">
+      <div class="row2">
+        <button class="btn small" id="btnExport">⬇ Exportar</button>
+        <button class="btn small" id="btnImport">⬆ Importar</button>
+      </div>
+      <button class="btn small" id="btnTheme">🌓 Cambiar tema</button>
+      <input type="file" id="fileImport" accept="application/json" style="display:none;">
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <div class="hero">
+      <div>
+        <h1>Tu roadmap: de 0 a agencia de automatización con IA</h1>
+        <p>Plan de 90 días. Marca cada paso al completarlo — tu progreso se guarda solo en este dispositivo.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num" id="heroDay">—</div><div class="lbl">Día actual</div></div>
+        <div class="hero-stat"><div class="num" id="heroWeek">—</div><div class="lbl">Semana currículum</div></div>
+        <div class="hero-stat"><div class="num" id="heroNext">—</div><div class="lbl">Próximo checkpoint</div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="phase" id="dashboard">
+      <div class="phase-head"><h2><span class="em">📊</span> Dashboard</h2></div>
+      <div class="card">
+        <h3>Resumen por fase</h3>
+        <div id="dashboardBars"></div>
+      </div>
+      <div class="card">
+        <h3>Vídeos grabados esta semana</h3>
+        <div class="prose">Meta: 7 vídeos/semana a partir de la semana 3. Marca los días que grabaste.</div>
+        <div class="video-week" id="videoWeek"></div>
+      </div>
+      <div class="card">
+        <h3>Recordatorio de horario</h3>
+        <div class="prose">
+          <p><strong>8:00–10:30</strong> · bloque técnico (automatizaciones, plan de la Fase 2)</p>
+          <p><strong>11:00–13:30</strong> · gimnasio</p>
+          <p><strong>16:15–18:15</strong> · 1h técnica + 1h de captación (martes y jueves: visitas)</p>
+          <p><strong>Python (2h)</strong> · apoyo, no prioridad — te da ventaja en nodos de código</p>
+          <p><strong>1 vídeo/día</strong> · desde la semana 3, graba lo que construyes: es tu portfolio</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOY -->
+    <section class="phase" id="hoy">
+      <div class="phase-head"><h2><span class="em">✅</span> Hoy</h2></div>
+      <div class="card">
+        <div class="prose" id="hoyFecha" style="margin-bottom:10px;"></div>
+        <div class="today-grid" id="todayList"></div>
+      </div>
+    </section>
+
+    <!-- FASE 0 -->
+    <section class="phase" id="fase0">
+      <div class="phase-head">
+        <h2><span class="em">🚦</span> Fase 0 — Antes de empezar</h2>
+        <div class="phase-progress"><div class="bar"><i id="bar-fase0"></i></div><span id="barlabel-fase0"></span></div>
+      </div>
+
+      <div class="card">
+        <h3>1. Cómo vas a cobrar</h3>
+        <div class="prose">
+          <p>En España no puedes darte de alta como autónomo hasta los 18 (salvo emancipación legal). Opciones reales mientras tanto:</p>
+          <p>• Facturar a través de un familiar dado de alta (lo más común, habla con tus padres).<br>
+          • Usar una cooperativa de facturación tipo Factoo/Abaco (te retienen un %, pero es legal y rápido).<br>
+          • Cobrar los primeros trabajos como pruebas/casos de estudio a precio bajo mientras montas lo anterior.</p>
+          <p><em>Si cierras un cliente de 2.000€ y no sabes emitirle factura, pierdes el cliente. Resuélvelo esta semana.</em></p>
+        </div>
+        <div class="checklist" data-phase="fase0">
+          <label class="chk" data-id="f0-facturacion"><input type="checkbox"><span class="txt">Elegido método de facturación (familiar dado de alta / cooperativa / pruebas a precio bajo)</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. Tu geografía</h3>
+        <div class="prose">
+          <p>Hinojosa y la comarca de Los Pedroches dan pocos negocios, pero eso también significa <strong>cero competencia local</strong>. Nadie ofrece esto ahí.</p>
+          <p>Úsalo para los primeros 3-5 clientes y para grabar contenido real ("he automatizado X en el bar de mi pueblo"), y luego salta a Córdoba capital / Pozoblanco / clientes en remoto.</p>
+        </div>
+        <div class="checklist" data-phase="fase0">
+          <label class="chk" data-id="f0-geografia"><input type="checkbox"><span class="txt">Definido el plan geográfico: primeros clientes en tu comarca + salto a Córdoba/remoto</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- FASE 1 -->
+    <section class="phase" id="fase1">
+      <div class="phase-head">
+        <h2><span class="em">🎯</span> Fase 1 — Qué vendes</h2>
+        <div class="phase-progress"><div class="bar"><i id="bar-fase1"></i></div><span id="barlabel-fase1"></span></div>
+      </div>
+
+      <div class="card">
+        <h3>No vendes automatizaciones, vendes resultado</h3>
+        <div class="prose">Concreta el dolor en un número que el dueño del negocio ya conoce:</div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Nicho</th><th>El dolor con número</th><th>Lo que le vendes</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Clínica dental</strong></td><td>8-15 citas perdidas al mes × 80-150€ = 1.000-2.000€/mes tirados</td><td>Sistema de recordatorios + reactivación de pacientes inactivos</td></tr>
+              <tr><td><strong>Inmobiliaria</strong></td><td>Leads de Idealista que se contestan a las 6h y ya han llamado a otro</td><td>Cualificación y respuesta automática en &lt;2 min + agenda de visitas</td></tr>
+              <tr><td><strong>Restaurante</strong></td><td>30 reseñas en Google vs. 400 del competidor</td><td>Solicitud automática de reseña tras cada reserva + respuesta a reseñas</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p><strong>Tu frase de venta NO es:</strong> "hago automatizaciones con inteligencia artificial".</p>
+          <p><strong>Es:</strong> <em>"Las clínicas pierden entre 1.000 y 2.000€ al mes en citas que la gente no cancela ni avisa. Monto un sistema que reduce eso a la mitad. ¿Cuántos huecos vacíos tuvisteis el mes pasado?"</em></p>
+          <p><strong>Regla de oro:</strong> antes de proponer nada, pregunta el número. Si el dueño te dice "unas 10 al mes", ya tienes tu propuesta hecha y él mismo ha justificado tu precio.</p>
+        </div>
+        <div class="checklist" data-phase="fase1">
+          <label class="chk" data-id="f1-nicho"><input type="checkbox"><span class="txt">Elegidos 1-2 nichos iniciales (dolor → número → oferta)</span></label>
+          <label class="chk" data-id="f1-frase"><input type="checkbox"><span class="txt">Escrita mi frase de venta basada en resultado, no en herramienta</span></label>
+          <label class="chk" data-id="f1-numero"><input type="checkbox"><span class="txt">Interiorizada la regla: preguntar el número antes de proponer nada</span></label>
+          <label class="chk" data-id="f1-nichos-extra"><input type="checkbox"><span class="txt">Revisados nichos secundarios desatendidos (gestorías, talleres, autoescuelas, fisios)</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- FASE 2 -->
+    <section class="phase" id="fase2">
+      <div class="phase-head">
+        <h2><span class="em">🛠️</span> Fase 2 — Construir (12 semanas)</h2>
+        <div class="phase-progress"><div class="bar"><i id="bar-fase2"></i></div><span id="barlabel-fase2"></span></div>
+      </div>
+      <div class="card">
+        <div class="prose">No estudies "n8n". Construye cosas. Cada bloque termina con algo grabado que puedes enseñar a un cliente.</div>
+
+        <div class="week-block" id="week-w12">
+          <div class="week-title">Semanas 1-2 — Fundamentos n8n</div>
+          <div class="week-sub">Instálalo self-hosted en un VPS barato (5-7€/mes): aprenderás el doble y podrás alojar los flujos de tus clientes.</div>
+          <div class="checklist" data-phase="fase2">
+            <label class="chk" data-id="w12-fundamentos"><input type="checkbox"><span class="txt">Dominados nodos, webhooks, HTTP Request, JSON, expresiones y manejo de errores</span></label>
+            <label class="chk" data-id="w12-vps"><input type="checkbox"><span class="txt">n8n instalado self-hosted en un VPS propio</span></label>
+            <label class="chk" data-id="w12-entregable"><input type="checkbox"><span class="txt">Entregable: formulario web → Google Sheets → email de confirmación, sin fallos<span class="deliverable-tag">Entregable</span></span></label>
+          </div>
+        </div>
+
+        <div class="week-block" id="week-w34">
+          <div class="week-title">Semanas 3-4 — APIs y datos</div>
+          <div class="week-sub">Aquí está el 80% del trabajo real de un cliente.</div>
+          <div class="checklist" data-phase="fase2">
+            <label class="chk" data-id="w34-apis"><input type="checkbox"><span class="txt">Dominado OAuth, API keys, Google Calendar/Sheets, Airtable como base de datos</span></label>
+            <label class="chk" data-id="w34-whatsapp"><input type="checkbox"><span class="txt">Integrada WhatsApp Business API (Twilio/360dialog)</span></label>
+            <label class="chk" data-id="w34-entregable"><input type="checkbox"><span class="txt">Entregable: recordatorio de citas por WhatsApp con confirmación y reagendado<span class="deliverable-tag">Entregable</span></span></label>
+          </div>
+        </div>
+
+        <div class="week-block" id="week-w56">
+          <div class="week-title">Semanas 5-6 — Agentes IA</div>
+          <div class="week-sub">Esto es lo que te diferencia de un simple "zapierista".</div>
+          <div class="checklist" data-phase="fase2">
+            <label class="chk" data-id="w56-agente"><input type="checkbox"><span class="txt">Dominado nodo AI Agent, memoria de conversación y tools</span></label>
+            <label class="chk" data-id="w56-rag"><input type="checkbox"><span class="txt">Implementado RAG básico con vector store y redacción de prompts de sistema</span></label>
+            <label class="chk" data-id="w56-entregable"><input type="checkbox"><span class="txt">Entregable: agente que atiende consultas web, cualifica y agenda en calendario<span class="deliverable-tag">Entregable</span></span></label>
+          </div>
+        </div>
+
+        <div class="week-block" id="week-w78">
+          <div class="week-title">Semanas 7-8 — Make y Zapier</div>
+          <div class="week-sub">Con n8n dominado, esto son 2 semanas, no 2 meses. Zapier para clientes que ya lo usan, Make cuando quieren ver el flujo visual, n8n para lógica compleja o margen.</div>
+          <div class="checklist" data-phase="fase2">
+            <label class="chk" data-id="w78-make"><input type="checkbox"><span class="txt">Replicados 2 escenarios ya construidos en Make</span></label>
+            <label class="chk" data-id="w78-zapier"><input type="checkbox"><span class="txt">Replicados 2 escenarios en Zapier — entregable en las 3 herramientas<span class="deliverable-tag">Entregable</span></span></label>
+          </div>
+        </div>
+
+        <div class="week-block" id="week-w910">
+          <div class="week-title">Semanas 9-10 — Vibe coding (Claude Code)</div>
+          <div class="week-sub">Para cuando el no-code no llega: panel de control, landing, backend pequeño.</div>
+          <div class="checklist" data-phase="fase2">
+            <label class="chk" data-id="w910-panel"><input type="checkbox"><span class="txt">Construido panel de control / landing / backend con vibe coding</span></label>
+            <label class="chk" data-id="w910-deploy"><input type="checkbox"><span class="txt">Desplegado en Vercel con base de datos conectada — panel con métricas del cliente<span class="deliverable-tag">Entregable</span></span></label>
+          </div>
+        </div>
+
+        <div class="week-block" id="week-w1112">
+          <div class="week-title">Semanas 11-12 — Empaquetar</div>
+          <div class="week-sub">Un producto se vende; "hago lo que necesites" no se vende.</div>
+          <div class="checklist" data-phase="fase2">
+            <label class="chk" data-id="w1112-producto1"><input type="checkbox"><span class="txt">Producto 1 empaquetado (nicho, precio fijo, plazo, demo grabada de 3 min)</span></label>
+            <label class="chk" data-id="w1112-producto2"><input type="checkbox"><span class="txt">Producto 2 empaquetado</span></label>
+            <label class="chk" data-id="w1112-producto3"><input type="checkbox"><span class="txt">Producto 3 empaquetado</span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FASE 3 -->
+    <section class="phase" id="fase3">
+      <div class="phase-head">
+        <h2><span class="em">🤝</span> Fase 3 — Primer cliente</h2>
+        <div class="phase-progress"><div class="bar"><i id="bar-fase3"></i></div><span id="barlabel-fase3"></span></div>
+      </div>
+
+      <div class="card">
+        <h3>Precio escalonado</h3>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Clientes</th><th>Precio</th><th>Condición</th></tr></thead>
+            <tbody>
+              <tr><td>1-3</td><td><strong>250-400€</strong></td><td>A cambio de reseña grabada en vídeo + permiso para usar resultados</td></tr>
+              <tr><td>4-6</td><td><strong>800-1.500€</strong></td><td>Ya tienes pruebas</td></tr>
+              <tr><td>7 en adelante</td><td><strong>2.000-4.000€</strong></td><td>Tu objetivo original</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p><strong>Añade mantenimiento desde el cliente 1: 100-300€/mes.</strong> Con 40 clientes pagando 300€/mes tienes 12.000€ recurrentes antes de vender nada nuevo. El recurrente es lo que hace posible el objetivo de 30.000€/mes.</p>
+        </div>
+        <div class="checklist" data-phase="fase3">
+          <label class="chk" data-id="f3-precios"><input type="checkbox"><span class="txt">Escalera de precios definida + mantenimiento mensual (100-300€/mes)</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Método de captación presencial</h3>
+        <div class="prose">
+          <p>Ratio realista: de 40 puertas, ~10 escuchan, ~3 aceptan demo, 1 paga. <strong>Necesitas 40 visitas para tu primer cliente</strong> — asúmelo desde el principio y los "no" dejan de doler.</p>
+        </div>
+        <div class="checklist" data-phase="fase3">
+          <label class="chk" data-id="f3-lista"><input type="checkbox"><span class="txt">1. Lista de 40 negocios de la comarca con dirección y nombre del dueño</span></label>
+          <label class="chk" data-id="f3-visitas"><input type="checkbox"><span class="txt">2. Ritmo de 20 visitas/semana en marcha, entre semana, a la hora tonta</span></label>
+          <label class="chk" data-id="f3-guion"><input type="checkbox"><span class="txt">3. Guion de primera visita listo: no vender, solo preguntar el número y pedir 15 min</span></label>
+          <label class="chk" data-id="f3-demo"><input type="checkbox"><span class="txt">4. Demo personalizada (su logo, sus horarios, WhatsApp de prueba) lista antes de la 2ª visita</span></label>
+          <label class="chk" data-id="f3-cierre"><input type="checkbox"><span class="txt">5. Segunda visita: demo funcionando, precio, cierre o próxima fecha</span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Dónde está la oportunidad de verdad</h3>
+        <div class="prose">
+          <p><strong>Restaurantes:</strong> fáciles de acceder, márgenes bajos, pagan poco. Campo de entrenamiento y fábrica de reseñas, no negocio principal.</p>
+          <p><strong>Clínicas dentales:</strong> mucho dinero y dolor medible, pero RGPD serio (contrato de encargado de tratamiento, nada de datos de pacientes fuera de la UE sin garantías).</p>
+          <p><strong>Inmobiliarias:</strong> tu mejor océano azul — comerciales, entienden el valor de un lead, deciden rápido, no dependes de tu pueblo.</p>
+          <p><strong>Menos obvio y desatendido:</strong> gestorías, talleres mecánicos, academias/autoescuelas, fisioterapeutas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECKPOINTS -->
+    <section class="phase" id="checkpoints">
+      <div class="phase-head"><h2><span class="em">🏁</span> Checkpoints</h2></div>
+      <div class="card checkpoint-card">
+        <div class="cp-day"><div class="n">30</div><div class="l">Día</div><div class="date" id="cpdate30"></div></div>
+        <div class="prose">Sistema de citas por WhatsApp funcionando + forma legal de facturar resuelta.</div>
+      </div>
+      <div class="card checkpoint-card">
+        <div class="cp-day"><div class="n">60</div><div class="l">Día</div><div class="date" id="cpdate60"></div></div>
+        <div class="prose">Agente IA funcionando + 40 negocios contactados + 3 demos personalizadas hechas.</div>
+      </div>
+      <div class="card checkpoint-card">
+        <div class="cp-day"><div class="n">90</div><div class="l">Día</div><div class="date" id="cpdate90"></div></div>
+        <div class="prose">Primer cliente de pago + reseña en vídeo + 3 productos empaquetados con precio.</div>
+      </div>
+      <div class="card">
+        <div class="prose"><em>Si el día 90 tienes un solo cliente pagando 300€, no has fracasado: has validado todo el sistema. A partir de ahí solo es repetir y subir precio.</em></div>
+      </div>
+    </section>
+
+    <!-- ERRORES -->
+    <section class="phase" id="errores">
+      <div class="phase-head">
+        <h2><span class="em">⚠️</span> Anexo — 9 errores que te van a costar meses</h2>
+        <div class="phase-progress"><div class="bar"><i id="bar-errores"></i></div><span id="barlabel-errores"></span></div>
+      </div>
+      <div class="card">
+        <div class="prose">Marca cada uno cuando lo tengas realmente interiorizado / aplicado a tu plan — no solo leído.</div>
+
+        <div class="error-item"><span class="num">1</span><strong>"Me formo un poco más y ya vendo."</strong><div class="fine">→ Fecha fija para tu primera visita (día 21). Vas, sepas lo que sepas.</div></div>
+        <div class="error-item"><span class="num">2</span><strong>Estudiar las tres herramientas a la vez.</strong><div class="fine">→ n8n a fondo primero. Make y Zapier después, 2 semanas no 2 meses.</div></div>
+        <div class="error-item"><span class="num">3</span><strong>Perseguir cada herramienta nueva.</strong><div class="fine">→ Herramienta nueva solo si un cliente la está pagando.</div></div>
+        <div class="error-item"><span class="num">4</span><strong>Vender la herramienta en vez del resultado.</strong><div class="fine">→ Habla solo de euros perdidos, huecos vacíos y llamadas sin contestar.</div></div>
+        <div class="error-item"><span class="num">5</span><strong>Bajar el precio cuando el cliente duda.</strong><div class="fine">→ Baja el alcance, nunca el precio.</div></div>
+        <div class="error-item"><span class="num">6</span><strong>Aceptar al cliente que regatea.</strong><div class="fine">→ Si regatea antes de firmar, di que no.</div></div>
+        <div class="error-item"><span class="num">7</span><strong>Trabajar sin cobrar por adelantado.</strong><div class="fine">→ 50% al firmar, 50% al entregar. Sin excepciones.</div></div>
+        <div class="error-item"><span class="num">8</span><strong>"Ya que estás, añádeme también..."</strong><div class="fine">→ Hoja firmada con "esto incluye" / "esto no incluye".</div></div>
+        <div class="error-item"><span class="num">9</span><strong>No medir el "antes".</strong><div class="fine">→ Apunta la métrica base antes de tocar nada.</div></div>
+
+        <div class="prose" style="margin-top:14px;"><strong>Tres errores extra que no se ven venir:</strong></div>
+        <div class="error-item"><strong>Depender de un cliente que es &gt;40% de tu facturación.</strong><div class="fine">Diversifica antes de necesitarlo.</div></div>
+        <div class="error-item"><strong>Gastarte el dinero de los impuestos.</strong><div class="fine">Aparta el 30% de cada factura en otra cuenta desde el primer cobro.</div></div>
+        <div class="error-item"><strong>Montarlo todo en tus cuentas personales.</strong><div class="fine">Credenciales, n8n y APIs en cuentas del cliente o espacio separado por cliente.</div></div>
+
+        <div class="checklist" data-phase="errores">
+          <label class="chk" data-id="err-1"><input type="checkbox"><span class="txt">1. No estoy retrasando mi primera visita "para formarme más"</span></label>
+          <label class="chk" data-id="err-2"><input type="checkbox"><span class="txt">2. Estudio n8n a fondo antes de tocar Make/Zapier</span></label>
+          <label class="chk" data-id="err-3"><input type="checkbox"><span class="txt">3. No persigo herramientas nuevas sin un cliente que las pague</span></label>
+          <label class="chk" data-id="err-4"><input type="checkbox"><span class="txt">4. Vendo resultado en euros, nunca la herramienta técnica</span></label>
+          <label class="chk" data-id="err-5"><input type="checkbox"><span class="txt">5. Tengo claro: bajar alcance, nunca precio</span></label>
+          <label class="chk" data-id="err-6"><input type="checkbox"><span class="txt">6. Digo que no al cliente que regatea antes de firmar</span></label>
+          <label class="chk" data-id="err-7"><input type="checkbox"><span class="txt">7. Cobro 50% al firmar / 50% al entregar, sin excepciones</span></label>
+          <label class="chk" data-id="err-8"><input type="checkbox"><span class="txt">8. Uso hoja de alcance firmada (incluye / no incluye)</span></label>
+          <label class="chk" data-id="err-9"><input type="checkbox"><span class="txt">9. Mido la métrica base antes de tocar nada</span></label>
+          <label class="chk" data-id="err-10"><input type="checkbox"><span class="txt">10. Ningún cliente supera el 40% de mi facturación</span></label>
+          <label class="chk" data-id="err-11"><input type="checkbox"><span class="txt">11. Aparto el 30% de cada factura para impuestos</span></label>
+          <label class="chk" data-id="err-12"><input type="checkbox"><span class="txt">12. Credenciales y APIs separadas por cliente, no en mis cuentas personales</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="phase" id="final">
+      <div class="phase-head">
+        <h2><span class="em">💶</span> Antes de cobrar el primer euro</h2>
+        <div class="phase-progress"><div class="bar"><i id="bar-final"></i></div><span id="barlabel-final"></span></div>
+      </div>
+      <div class="card">
+        <div class="checklist" data-phase="final">
+          <label class="chk" data-id="final-factura"><input type="checkbox"><span class="txt">1. Forma legal de facturar cerrada (familiar de alta o cooperativa)</span></label>
+          <label class="chk" data-id="final-hoja"><input type="checkbox"><span class="txt">2. Hoja de alcance de una página: qué incluye, qué no, plazo, precio, 50% adelantado</span></label>
+          <label class="chk" data-id="final-metrica"><input type="checkbox"><span class="txt">3. Métrica base del cliente anotada por escrito y confirmada por él</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="phase" id="ajustes">
+      <div class="phase-head"><h2><span class="em">⚙️</span> Ajustes</h2></div>
+      <div class="card">
+        <div class="settings-row">
+          <div><label>Fecha de inicio del plan</label><div class="desc">Se usa para calcular tu día actual, semana de currículum y checkpoints (día 30/60/90).</div></div>
+          <input type="date" id="startDateInput">
+        </div>
+        <div class="settings-row">
+          <div><label>Tema</label><div class="desc">Oscuro / claro</div></div>
+          <button class="btn small" id="btnThemeSettings">Cambiar tema</button>
+        </div>
+        <div class="settings-row">
+          <div><label>Backup de tu progreso</label><div class="desc">Descarga un JSON con todo tu progreso, o restaura uno anterior.</div></div>
+          <div class="row2" style="min-width:200px;">
+            <button class="btn small" id="btnExport2">Exportar</button>
+            <button class="btn small" id="btnImport2">Importar</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div><label>Reiniciar todo</label><div class="desc">Borra todo el progreso guardado en este navegador. No se puede deshacer.</div></div>
+          <button class="btn small danger" id="btnReset">Reiniciar progreso</button>
+        </div>
+      </div>
+      <p class="fine">Todo se guarda en <code>localStorage</code> de tu navegador — nada se envía a ningún servidor. Guarda este archivo (index.html) donde quieras y ábrelo con doble clic cuando quieras seguir tu progreso; usa "Exportar" de vez en cuando para tener una copia de seguridad, especialmente si cambias de navegador o dispositivo.</p>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LS = {
+    progress: "roadmap_progress_v1",
+    start: "roadmap_start_date_v1",
+    theme: "roadmap_theme_v1",
+    videos: "roadmap_videos_v1",
+    daily: "roadmap_daily_v1", // { "2026-07-28": {itemId: true} }
+    notes: "roadmap_notes_v1"
+  };
+
+  function load(key, fallback){
+    try{
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    }catch(e){ return fallback; }
+  }
+  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+  var progress = load(LS.progress, {});   // { itemId: true/false }
+  var videos = load(LS.videos, {});       // { "2026-07-28": true }
+  var daily = load(LS.daily, {});         // { "2026-07-28": { taskId: true } }
+
+  // ---------- THEME ----------
+  function applyTheme(t){
+    if(t === "dark" || t === "light"){
+      document.documentElement.setAttribute("data-theme", t);
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }
+  var theme = load(LS.theme, null);
+  applyTheme(theme);
+  function toggleTheme(){
+    var current = document.documentElement.getAttribute("data-theme");
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var effectiveCurrent = current || (prefersDark ? "dark" : "light");
+    var next = effectiveCurrent === "dark" ? "light" : "dark";
+    applyTheme(next);
+    save(LS.theme, next);
+  }
+  document.getElementById("btnTheme").addEventListener("click", toggleTheme);
+  document.getElementById("btnThemeSettings").addEventListener("click", toggleTheme);
+
+  // ---------- TOAST ----------
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 2200);
+  }
+
+  // ---------- DATE HELPERS ----------
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+  function fmtDate(d){
+    return d.toLocaleDateString("es-ES", { day:"2-digit", month:"short", year:"numeric" });
+  }
+  function addDays(dateStr, n){
+    var d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+  function dayDiff(fromStr, toDate){
+    var from = new Date(fromStr + "T00:00:00");
+    var ms = toDate.getTime() - from.getTime();
+    return Math.floor(ms / 86400000);
+  }
+
+  var startDateInput = document.getElementById("startDateInput");
+  var storedStart = load(LS.start, null);
+  if(!storedStart){ storedStart = todayStr(); save(LS.start, storedStart); }
+  startDateInput.value = storedStart;
+  startDateInput.addEventListener("change", function(){
+    if(startDateInput.value){
+      save(LS.start, startDateInput.value);
+      toast("Fecha de inicio actualizada");
+      renderDashboardHeader();
+    }
+  });
+
+  // ---------- CHECKLIST ITEMS ----------
+  var allChecks = Array.prototype.slice.call(document.querySelectorAll(".chk"));
+  var phaseIds = ["fase0","fase1","fase2","fase3","errores","final"];
+
+  function itemChecked(id){ return !!progress[id]; }
+
+  function paintCheck(el){
+    var id = el.getAttribute("data-id");
+    var input = el.querySelector("input");
+    var checked = itemChecked(id);
+    input.checked = checked;
+    el.classList.toggle("checked", checked);
+  }
+
+  allChecks.forEach(function(el){
+    paintCheck(el);
+    el.querySelector("input").addEventListener("change", function(e){
+      var id = el.getAttribute("data-id");
+      progress[id] = e.target.checked;
+      save(LS.progress, progress);
+      paintCheck(el);
+      renderAll();
+      if(e.target.checked) toast("✔ Guardado");
+    });
+  });
+
+  function phaseStats(phase){
+    var items = allChecks.filter(function(el){ return el.getAttribute("data-id").indexOf(phasePrefixMap(phase)) === 0 || el.closest(".checklist").getAttribute("data-phase") === phase; });
+    var total = items.length;
+    var done = items.filter(function(el){ return itemChecked(el.getAttribute("data-id")); }).length;
+    return { total: total, done: done };
+  }
+  function phasePrefixMap(){ return "___none___"; }
+
+  function statsForSelector(phaseAttr){
+    var items = Array.prototype.slice.call(document.querySelectorAll('.checklist[data-phase="'+phaseAttr+'"] .chk'));
+    var total = items.length;
+    var done = items.filter(function(el){ return itemChecked(el.getAttribute("data-id")); }).length;
+    return { total: total, done: done };
+  }
+
+  function updateBar(phaseAttr, barId, labelId, navId){
+    var s = statsForSelector(phaseAttr);
+    var pct = s.total ? Math.round((s.done/s.total)*100) : 0;
+    var bar = document.getElementById(barId);
+    if(bar) bar.style.width = pct + "%";
+    var label = document.getElementById(labelId);
+    if(label) label.textContent = s.done + "/" + s.total;
+    if(navId){
+      var nav = document.getElementById(navId);
+      if(nav){
+        nav.textContent = s.done + "/" + s.total;
+        nav.parentElement.classList.toggle("done", s.total > 0 && s.done === s.total);
+      }
+    }
+    return s;
+  }
+
+  var weekMap = {
+    "week-w12": "w12-", "week-w34": "w34-", "week-w56": "w56-",
+    "week-w78": "w78-", "week-w910": "w910-", "week-w1112": "w1112-"
+  };
+  function updateWeekBlocks(){
+    Object.keys(weekMap).forEach(function(wid){
+      var block = document.getElementById(wid);
+      if(!block) return;
+      var items = Array.prototype.slice.call(block.querySelectorAll(".chk"));
+      var done = items.filter(function(el){ return itemChecked(el.getAttribute("data-id")); }).length;
+      block.classList.toggle("done", items.length > 0 && done === items.length);
+    });
+  }
+
+  function renderAll(){
+    var s0 = updateBar("fase0","bar-fase0","barlabel-fase0","navf0");
+    var s1 = updateBar("fase1","bar-fase1","barlabel-fase1","navf1");
+    var s2 = updateBar("fase2","bar-fase2","barlabel-fase2","navf2");
+    var s3 = updateBar("fase3","bar-fase3","barlabel-fase3","navf3");
+    var se = updateBar("errores","bar-errores","barlabel-errores","naverr");
+    var sf = updateBar("final","bar-final","barlabel-final","navfinal");
+    updateWeekBlocks();
+
+    var totalAll = s0.total+s1.total+s2.total+s3.total+se.total+sf.total;
+    var doneAll = s0.done+s1.done+s2.done+s3.done+se.done+sf.done;
+    var pctAll = totalAll ? Math.round((doneAll/totalAll)*100) : 0;
+
+    document.getElementById("ringPct").textContent = pctAll + "%";
+    document.getElementById("ringValue").textContent = doneAll + " / " + totalAll + " tareas";
+    var circumference = 2 * Math.PI * 27;
+    var ringEl = document.getElementById("ringProgress");
+    ringEl.setAttribute("stroke-dasharray", circumference.toFixed(1));
+    ringEl.setAttribute("stroke-dashoffset", (circumference * (1 - pctAll/100)).toFixed(1));
+
+    // Dashboard bars
+    var dash = document.getElementById("dashboardBars");
+    var phases = [
+      {label:"Fase 0 — Antes de empezar", s:s0},
+      {label:"Fase 1 — Qué vendes", s:s1},
+      {label:"Fase 2 — Construir", s:s2},
+      {label:"Fase 3 — Primer cliente", s:s3},
+      {label:"Errores a evitar", s:se},
+      {label:"Antes de cobrar", s:sf}
+    ];
+    dash.innerHTML = phases.map(function(p){
+      var pct = p.s.total ? Math.round((p.s.done/p.s.total)*100) : 0;
+      return '<div style="margin-bottom:12px;">'+
+        '<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">'+
+          '<span>'+p.label+'</span><span style="color:var(--text-faint);">'+p.s.done+'/'+p.s.total+'</span>'+
+        '</div>'+
+        '<div class="bar"><i style="width:'+pct+'%;"></i></div>'+
+      '</div>';
+    }).join("");
+  }
+
+  // ---------- HEADER / DASHBOARD DATES ----------
+  function renderDashboardHeader(){
+    var start = load(LS.start, todayStr());
+    var now = new Date();
+    var dNum = dayDiff(start, now) + 1;
+    document.getElementById("heroDay").textContent = dNum > 0 ? "Día " + dNum : "Día 1";
+    var weekNum = Math.max(1, Math.ceil(dNum/7));
+    var weekLabel = weekNum > 12 ? "12+" : String(weekNum);
+    document.getElementById("heroWeek").textContent = "S" + weekLabel;
+
+    var checkpoints = [30,60,90];
+    var next = checkpoints.find(function(c){ return dNum <= c; });
+    if(next){
+      document.getElementById("heroNext").textContent = "Día " + next + " (" + Math.max(0,next-dNum) + "d)";
+    } else {
+      document.getElementById("heroNext").textContent = "¡Completado!";
+    }
+
+    document.getElementById("cpdate30").textContent = fmtDate(addDays(start,29));
+    document.getElementById("cpdate60").textContent = fmtDate(addDays(start,59));
+    document.getElementById("cpdate90").textContent = fmtDate(addDays(start,89));
+  }
+
+  // ---------- HOY (daily tracker) ----------
+  var dailyTasks = [
+    {id:"d-tecnico-am", label:"Bloque técnico 8:00–10:30", sub:"Automatizaciones / plan Fase 2"},
+    {id:"d-gym", label:"Gimnasio 11:00–13:30", sub:""},
+    {id:"d-tecnico-pm", label:"Bloque técnico 16:15–17:15", sub:""},
+    {id:"d-captacion", label:"Bloque captación 17:15–18:15", sub:"Martes/jueves: visitas presenciales"},
+    {id:"d-python", label:"Python (2h)", sub:"Apoyo técnico"},
+    {id:"d-video", label:"Vídeo grabado hoy", sub:"Meta: 7/semana desde la semana 3"}
+  ];
+
+  function renderToday(){
+    var t = todayStr();
+    if(!daily[t]) daily[t] = {};
+    var d = new Date();
+    document.getElementById("hoyFecha").innerHTML = "<strong>" + d.toLocaleDateString("es-ES",{weekday:"long", day:"numeric", month:"long"}) + "</strong>";
+    var list = document.getElementById("todayList");
+    list.innerHTML = dailyTasks.map(function(task){
+      var on = !!daily[t][task.id];
+      return '<div class="today-item" data-task="'+task.id+'">'+
+        '<div class="t">'+task.label+(task.sub?'<small>'+task.sub+'</small>':'')+'</div>'+
+        '<div class="toggle '+(on?"on":"")+'"></div>'+
+      '</div>';
+    }).join("");
+    Array.prototype.slice.call(list.querySelectorAll(".today-item")).forEach(function(row){
+      row.addEventListener("click", function(){
+        var tid = row.getAttribute("data-task");
+        var tKey = todayStr();
+        if(!daily[tKey]) daily[tKey] = {};
+        daily[tKey][tid] = !daily[tKey][tid];
+        save(LS.daily, daily);
+        if(tid === "d-video"){
+          videos[tKey] = daily[tKey][tid];
+          save(LS.videos, videos);
+          renderVideoWeek();
+        }
+        renderToday();
+        toast(daily[tKey][tid] ? "✔ Marcado" : "Desmarcado");
+      });
+    });
+  }
+
+  // ---------- VIDEO WEEK ----------
+  function getMonday(d){
+    var day = d.getDay();
+    var diff = (day === 0 ? -6 : 1) - day;
+    var monday = new Date(d);
+    monday.setDate(d.getDate() + diff);
+    monday.setHours(0,0,0,0);
+    return monday;
+  }
+  function renderVideoWeek(){
+    var monday = getMonday(new Date());
+    var names = ["L","M","X","J","V","S","D"];
+    var wrap = document.getElementById("videoWeek");
+    var todayKey = todayStr();
+    var html = "";
+    for(var i=0;i<7;i++){
+      var d = new Date(monday);
+      d.setDate(monday.getDate()+i);
+      var key = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+      var on = !!videos[key];
+      var isToday = key === todayKey;
+      html += '<div class="video-day '+(on?"on":"")+' '+(isToday?"today":"")+'" data-date="'+key+'">'+
+        '<div class="d">'+names[i]+'</div><div>'+(on?"✓":"—")+'</div>'+
+      '</div>';
+    }
+    wrap.innerHTML = html;
+    Array.prototype.slice.call(wrap.querySelectorAll(".video-day")).forEach(function(el){
+      el.addEventListener("click", function(){
+        var key = el.getAttribute("data-date");
+        videos[key] = !videos[key];
+        save(LS.videos, videos);
+        if(key === todayStr()){
+          if(!daily[key]) daily[key] = {};
+          daily[key]["d-video"] = videos[key];
+          save(LS.daily, daily);
+          renderToday();
+        }
+        renderVideoWeek();
+      });
+    });
+  }
+
+  // ---------- NAV / SCROLLSPY ----------
+  var navlinks = Array.prototype.slice.call(document.querySelectorAll(".navlink"));
+  navlinks.forEach(function(a){
+    a.addEventListener("click", function(){
+      var target = document.getElementById(a.getAttribute("data-target"));
+      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main section.phase"));
+  function updateActiveNav(){
+    var scrollPos = window.scrollY + 120;
+    var current = sections[0] && sections[0].id;
+    sections.forEach(function(sec){
+      if(sec.offsetTop <= scrollPos) current = sec.id;
+    });
+    navlinks.forEach(function(a){
+      a.classList.toggle("active", a.getAttribute("data-target") === current);
+    });
+  }
+  window.addEventListener("scroll", updateActiveNav, {passive:true});
+
+  // ---------- EXPORT / IMPORT ----------
+  function doExport(){
+    var data = {
+      progress: progress,
+      start: load(LS.start, null),
+      videos: videos,
+      daily: daily,
+      theme: load(LS.theme, null),
+      exportedAt: new Date().toISOString()
+    };
+    var blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "roadmap-progreso-" + todayStr() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast("Backup descargado");
+  }
+  document.getElementById("btnExport").addEventListener("click", doExport);
+  document.getElementById("btnExport2").addEventListener("click", doExport);
+
+  var fileImport = document.getElementById("fileImport");
+  function triggerImport(){ fileImport.click(); }
+  document.getElementById("btnImport").addEventListener("click", triggerImport);
+  document.getElementById("btnImport2").addEventListener("click", triggerImport);
+  fileImport.addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var data = JSON.parse(ev.target.result);
+        progress = data.progress || {};
+        videos = data.videos || {};
+        daily = data.daily || {};
+        save(LS.progress, progress);
+        save(LS.videos, videos);
+        save(LS.daily, daily);
+        if(data.start){ save(LS.start, data.start); startDateInput.value = data.start; }
+        if(data.theme){ save(LS.theme, data.theme); applyTheme(data.theme); }
+        allChecks.forEach(paintCheck);
+        renderAll();
+        renderDashboardHeader();
+        renderToday();
+        renderVideoWeek();
+        toast("Progreso restaurado");
+      }catch(err){
+        toast("Error: archivo no válido");
+      }
+    };
+    reader.readAsText(file);
+    fileImport.value = "";
+  });
+
+  document.getElementById("btnReset").addEventListener("click", function(){
+    if(confirm("¿Seguro que quieres borrar TODO tu progreso? Esta acción no se puede deshacer.")){
+      Object.keys(LS).forEach(function(k){ localStorage.removeItem(LS[k]); });
+      location.reload();
+    }
+  });
+
+  // ---------- INIT ----------
+  renderAll();
+  renderDashboardHeader();
+  renderToday();
+  renderVideoWeek();
+  updateActiveNav();
+})();
+</script>
+</body>
+</html>
