@@ -105,6 +105,7 @@
     background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:1px 7px;
   }
   nav.navlist .navlink.done .badge{color:var(--accent-2);border-color:rgba(61,220,151,.4);}
+  .nav-divider{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);padding:14px 10px 2px;}
 
   .side-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px;}
   .btn{
@@ -118,6 +119,7 @@
   .btn.primary:hover{filter:brightness(1.08);}
   .btn.small{padding:6px 9px;font-size:11.5px;}
   .btn.danger{color:var(--accent-danger);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
   .row2{display:flex;gap:8px;}
   .row2 .btn{flex:1;}
 
@@ -181,11 +183,17 @@
   .chk .txt{font-size:13.5px;line-height:1.45;}
   .chk.checked .txt{color:var(--text-faint);text-decoration:line-through;}
   .chk .txt small{display:block;color:var(--text-faint);font-size:11.5px;text-decoration:none;margin-top:2px;}
+  .chk.readonly{cursor:default;}
+  .chk.readonly input{cursor:default;}
 
   .deliverable-tag{
     display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--accent-warn);
     background:rgba(255,182,72,.12);border:1px solid rgba(255,182,72,.3);
     padding:2px 8px;border-radius:20px;margin-left:8px;text-transform:uppercase;letter-spacing:.03em;
+  }
+  .pill-phase{
+    display:inline-flex;align-items:center;font-size:10px;color:var(--text-faint);
+    border:1px solid var(--border);border-radius:20px;padding:1px 8px;margin-left:8px;white-space:nowrap;
   }
 
   .notes-toggle{font-size:11.5px;color:var(--text-faint);cursor:pointer;margin-top:10px;display:inline-block;}
@@ -222,11 +230,12 @@
   .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text-dim);transition:.15s;}
   .toggle.on{background:var(--accent-2);}
   .toggle.on::after{left:21px;background:#0b0d12;}
+  .toggle.locked{cursor:default;opacity:.55;}
 
   .video-week{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
   .video-day{
-    width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--bg-elev);
-    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-faint);cursor:pointer;
+    width:38px;height:38px;border-radius:9px;border:1px solid var(--border);background:var(--bg-elev);
+    display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--text-faint);
     flex-direction:column;gap:1px;
   }
   .video-day .d{font-size:9px;}
@@ -266,6 +275,25 @@
 
   .fine{font-size:11.5px;color:var(--text-faint);line-height:1.5;}
   hr.sep{border:none;border-top:1px solid var(--border);margin:22px 0;}
+
+  /* PLAN DIARIO */
+  .day-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;}
+  .day-nav .dn-title{font-size:17px;font-weight:800;}
+  .day-nav .dn-date{font-size:12px;color:var(--text-faint);margin-top:2px;}
+  .day-nav .dn-arrows{display:flex;gap:6px;flex-shrink:0;}
+  .day-pace{font-size:11.5px;color:var(--text-faint);margin-bottom:10px;}
+  .day-pace.ahead{color:var(--accent-2);}
+  .day-pace.behind{color:var(--accent-warn);}
+  .day-banner{background:rgba(61,220,151,.12);border:1px solid rgba(61,220,151,.35);color:var(--accent-2);padding:8px 12px;border-radius:10px;font-size:12.5px;margin-bottom:12px;}
+  .day-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);margin:14px 0 2px;}
+  .complete-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px;transition:filter .15s;}
+  .complete-btn.ready{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;}
+  .complete-btn.ready:hover{filter:brightness(1.08);}
+  .complete-btn.notready{background:var(--bg-elev);color:var(--text-faint);border:1px solid var(--border);cursor:not-allowed;}
+  .plan-finished{text-align:center;padding:30px 10px;}
+  .plan-finished .big{font-size:34px;margin-bottom:8px;}
+  .history-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--text-dim);padding:7px 4px;border-bottom:1px solid var(--border);}
+  .history-row:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -291,14 +319,15 @@
         <div class="pct" id="ringPct">0%</div>
       </div>
       <div class="ring-info">
-        <div class="label">Progreso total</div>
+        <div class="label">Currículum</div>
         <div class="value" id="ringValue">0 / 0 tareas</div>
       </div>
     </div>
 
     <nav class="navlist" id="navlist">
+      <a class="navlink" data-target="plan"><span class="ic">📅</span> Plan diario <span class="badge" id="navPlan"></span></a>
       <a class="navlink" data-target="dashboard"><span class="ic">📊</span> Dashboard</a>
-      <a class="navlink" data-target="hoy"><span class="ic">✅</span> Hoy <span class="badge" id="navHoy"></span></a>
+      <div class="nav-divider">Referencia</div>
       <a class="navlink" data-target="fase0"><span class="ic">🚦</span> Fase 0 <span class="badge" id="navf0"></span></a>
       <a class="navlink" data-target="fase1"><span class="ic">🎯</span> Fase 1 <span class="badge" id="navf1"></span></a>
       <a class="navlink" data-target="fase2"><span class="ic">🛠️</span> Fase 2 <span class="badge" id="navf2"></span></a>
@@ -325,25 +354,35 @@
     <div class="hero">
       <div>
         <h1>Tu roadmap: de 0 a agencia de automatización con IA</h1>
-        <p>Plan de 90 días. Marca cada paso al completarlo — tu progreso se guarda solo en este dispositivo.</p>
+        <p>Sigue tu plan día a día. Completa todo lo de hoy y la app pasa sola al día siguiente.</p>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="num" id="heroDay">—</div><div class="lbl">Día actual</div></div>
+        <div class="hero-stat"><div class="num" id="heroDay">—</div><div class="lbl">Día del plan</div></div>
         <div class="hero-stat"><div class="num" id="heroWeek">—</div><div class="lbl">Semana currículum</div></div>
         <div class="hero-stat"><div class="num" id="heroNext">—</div><div class="lbl">Próximo checkpoint</div></div>
       </div>
     </div>
 
+    <!-- PLAN DIARIO -->
+    <section class="phase" id="plan">
+      <div class="phase-head"><h2><span class="em">📅</span> Plan diario</h2></div>
+      <div class="card" id="planCard"></div>
+      <div class="card" id="planHistoryCard">
+        <h3>Historial de días completados</h3>
+        <div id="planHistory"><div class="empty-hint">Aún no has completado ningún día.</div></div>
+      </div>
+    </section>
+
     <!-- DASHBOARD -->
     <section class="phase" id="dashboard">
       <div class="phase-head"><h2><span class="em">📊</span> Dashboard</h2></div>
       <div class="card">
-        <h3>Resumen por fase</h3>
+        <h3>Resumen por fase (currículum de referencia)</h3>
         <div id="dashboardBars"></div>
       </div>
       <div class="card">
-        <h3>Vídeos grabados esta semana</h3>
-        <div class="prose">Meta: 7 vídeos/semana a partir de la semana 3. Marca los días que grabaste.</div>
+        <h3>Vídeos — últimos 7 días de tu plan</h3>
+        <div class="prose">Meta: 7 vídeos/semana a partir de la semana 3. Solo puedes marcar el día actual de tu plan.</div>
         <div class="video-week" id="videoWeek"></div>
       </div>
       <div class="card">
@@ -355,15 +394,6 @@
           <p><strong>Python (2h)</strong> · apoyo, no prioridad — te da ventaja en nodos de código</p>
           <p><strong>1 vídeo/día</strong> · desde la semana 3, graba lo que construyes: es tu portfolio</p>
         </div>
-      </div>
-    </section>
-
-    <!-- HOY -->
-    <section class="phase" id="hoy">
-      <div class="phase-head"><h2><span class="em">✅</span> Hoy</h2></div>
-      <div class="card">
-        <div class="prose" id="hoyFecha" style="margin-bottom:10px;"></div>
-        <div class="today-grid" id="todayList"></div>
       </div>
     </section>
 
@@ -636,7 +666,7 @@
       <div class="phase-head"><h2><span class="em">⚙️</span> Ajustes</h2></div>
       <div class="card">
         <div class="settings-row">
-          <div><label>Fecha de inicio del plan</label><div class="desc">Se usa para calcular tu día actual, semana de currículum y checkpoints (día 30/60/90).</div></div>
+          <div><label>Fecha de inicio del plan (Día 1)</label><div class="desc">El Día 1 de tu plan diario siempre es esta fecha. Cambiarla recalcula las fechas mostradas, pero no tu progreso.</div></div>
           <input type="date" id="startDateInput">
         </div>
         <div class="settings-row">
@@ -644,18 +674,18 @@
           <button class="btn small" id="btnThemeSettings">Cambiar tema</button>
         </div>
         <div class="settings-row">
-          <div><label>Backup de tu progreso</label><div class="desc">Descarga un JSON con todo tu progreso, o restaura uno anterior.</div></div>
+          <div><label>Backup de tu progreso</label><div class="desc">Descarga un JSON con todo tu progreso (incluye el día en el que vas), o restaura uno anterior.</div></div>
           <div class="row2" style="min-width:200px;">
             <button class="btn small" id="btnExport2">Exportar</button>
             <button class="btn small" id="btnImport2">Importar</button>
           </div>
         </div>
         <div class="settings-row">
-          <div><label>Reiniciar todo</label><div class="desc">Borra todo el progreso guardado en este navegador. No se puede deshacer.</div></div>
+          <div><label>Reiniciar todo</label><div class="desc">Borra todo el progreso guardado en este navegador, incluido el día actual. No se puede deshacer.</div></div>
           <button class="btn small danger" id="btnReset">Reiniciar progreso</button>
         </div>
       </div>
-      <p class="fine">Todo se guarda en <code>localStorage</code> de tu navegador — nada se envía a ningún servidor. Guarda este archivo (index.html) donde quieras y ábrelo con doble clic cuando quieras seguir tu progreso; usa "Exportar" de vez en cuando para tener una copia de seguridad, especialmente si cambias de navegador o dispositivo.</p>
+      <p class="fine">Todo se guarda en <code>localStorage</code> de tu navegador — nada se envía a ningún servidor. El "Plan diario" avanza cuando completas TODAS las tareas del día (hábitos + lo específico de esa quincena); al hacerlo se genera automáticamente el día siguiente. Guarda este archivo (index.html) donde quieras y ábrelo con doble clic cuando quieras seguir tu progreso; usa "Exportar" de vez en cuando para tener una copia de seguridad.</p>
     </section>
 
   </main>
@@ -671,9 +701,8 @@
     progress: "roadmap_progress_v1",
     start: "roadmap_start_date_v1",
     theme: "roadmap_theme_v1",
-    videos: "roadmap_videos_v1",
-    daily: "roadmap_daily_v1", // { "2026-07-28": {itemId: true} }
-    notes: "roadmap_notes_v1"
+    currentDay: "roadmap_currentday_v1",
+    history: "roadmap_history_v1"
   };
 
   function load(key, fallback){
@@ -684,9 +713,10 @@
   }
   function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
-  var progress = load(LS.progress, {});   // { itemId: true/false }
-  var videos = load(LS.videos, {});       // { "2026-07-28": true }
-  var daily = load(LS.daily, {});         // { "2026-07-28": { taskId: true } }
+  var progress = load(LS.progress, {});     // { itemId: true/false } — incluye ids de currículum y de hábitos "d{N}-{taskId}"
+  var currentDay = load(LS.currentDay, 1);  // día del plan en el que estás (avanza solo al completar)
+  var history = load(LS.history, []);       // [{day, completedAt}]
+  var viewingDay = currentDay;              // día que se está mostrando ahora mismo (1..currentDay)
 
   // ---------- THEME ----------
   function applyTheme(t){
@@ -727,6 +757,9 @@
   function fmtDate(d){
     return d.toLocaleDateString("es-ES", { day:"2-digit", month:"short", year:"numeric" });
   }
+  function fmtDateTime(iso){
+    return new Date(iso).toLocaleDateString("es-ES", { day:"2-digit", month:"short", year:"numeric" });
+  }
   function addDays(dateStr, n){
     var d = new Date(dateStr + "T00:00:00");
     d.setDate(d.getDate() + n);
@@ -747,12 +780,12 @@
       save(LS.start, startDateInput.value);
       toast("Fecha de inicio actualizada");
       renderDashboardHeader();
+      renderPlanDay();
     }
   });
 
-  // ---------- CHECKLIST ITEMS ----------
+  // ---------- CHECKLIST ITEMS (currículum de referencia) ----------
   var allChecks = Array.prototype.slice.call(document.querySelectorAll(".chk"));
-  var phaseIds = ["fase0","fase1","fase2","fase3","errores","final"];
 
   function itemChecked(id){ return !!progress[id]; }
 
@@ -772,17 +805,10 @@
       save(LS.progress, progress);
       paintCheck(el);
       renderAll();
+      renderPlanDay();
       if(e.target.checked) toast("✔ Guardado");
     });
   });
-
-  function phaseStats(phase){
-    var items = allChecks.filter(function(el){ return el.getAttribute("data-id").indexOf(phasePrefixMap(phase)) === 0 || el.closest(".checklist").getAttribute("data-phase") === phase; });
-    var total = items.length;
-    var done = items.filter(function(el){ return itemChecked(el.getAttribute("data-id")); }).length;
-    return { total: total, done: done };
-  }
-  function phasePrefixMap(){ return "___none___"; }
 
   function statsForSelector(phaseAttr){
     var items = Array.prototype.slice.call(document.querySelectorAll('.checklist[data-phase="'+phaseAttr+'"] .chk'));
@@ -842,6 +868,9 @@
     ringEl.setAttribute("stroke-dasharray", circumference.toFixed(1));
     ringEl.setAttribute("stroke-dashoffset", (circumference * (1 - pctAll/100)).toFixed(1));
 
+    var navPlan = document.getElementById("navPlan");
+    if(navPlan) navPlan.textContent = "Día " + Math.min(currentDay,90) + "/90";
+
     // Dashboard bars
     var dash = document.getElementById("dashboardBars");
     var phases = [
@@ -864,19 +893,21 @@
   }
 
   // ---------- HEADER / DASHBOARD DATES ----------
+  function realCalendarDay(){
+    var start = load(LS.start, todayStr());
+    return dayDiff(start, new Date()) + 1;
+  }
+
   function renderDashboardHeader(){
     var start = load(LS.start, todayStr());
-    var now = new Date();
-    var dNum = dayDiff(start, now) + 1;
-    document.getElementById("heroDay").textContent = dNum > 0 ? "Día " + dNum : "Día 1";
-    var weekNum = Math.max(1, Math.ceil(dNum/7));
-    var weekLabel = weekNum > 12 ? "12+" : String(weekNum);
-    document.getElementById("heroWeek").textContent = "S" + weekLabel;
+    document.getElementById("heroDay").textContent = "Día " + Math.min(currentDay,90);
+    var weekNum = Math.max(1, Math.ceil(Math.min(currentDay,90)/7));
+    document.getElementById("heroWeek").textContent = "S" + weekNum;
 
     var checkpoints = [30,60,90];
-    var next = checkpoints.find(function(c){ return dNum <= c; });
+    var next = checkpoints.find(function(c){ return currentDay <= c; });
     if(next){
-      document.getElementById("heroNext").textContent = "Día " + next + " (" + Math.max(0,next-dNum) + "d)";
+      document.getElementById("heroNext").textContent = "Día " + next + " (" + Math.max(0,next-currentDay) + "d)";
     } else {
       document.getElementById("heroNext").textContent = "¡Completado!";
     }
@@ -886,7 +917,7 @@
     document.getElementById("cpdate90").textContent = fmtDate(addDays(start,89));
   }
 
-  // ---------- HOY (daily tracker) ----------
+  // ---------- PLAN DIARIO: datos ----------
   var dailyTasks = [
     {id:"d-tecnico-am", label:"Bloque técnico 8:00–10:30", sub:"Automatizaciones / plan Fase 2"},
     {id:"d-gym", label:"Gimnasio 11:00–13:30", sub:""},
@@ -896,75 +927,227 @@
     {id:"d-video", label:"Vídeo grabado hoy", sub:"Meta: 7/semana desde la semana 3"}
   ];
 
-  function renderToday(){
-    var t = todayStr();
-    if(!daily[t]) daily[t] = {};
-    var d = new Date();
-    document.getElementById("hoyFecha").innerHTML = "<strong>" + d.toLocaleDateString("es-ES",{weekday:"long", day:"numeric", month:"long"}) + "</strong>";
-    var list = document.getElementById("todayList");
-    list.innerHTML = dailyTasks.map(function(task){
-      var on = !!daily[t][task.id];
-      return '<div class="today-item" data-task="'+task.id+'">'+
-        '<div class="t">'+task.label+(task.sub?'<small>'+task.sub+'</small>':'')+'</div>'+
-        '<div class="toggle '+(on?"on":"")+'"></div>'+
-      '</div>';
-    }).join("");
-    Array.prototype.slice.call(list.querySelectorAll(".today-item")).forEach(function(row){
-      row.addEventListener("click", function(){
-        var tid = row.getAttribute("data-task");
-        var tKey = todayStr();
-        if(!daily[tKey]) daily[tKey] = {};
-        daily[tKey][tid] = !daily[tKey][tid];
-        save(LS.daily, daily);
-        if(tid === "d-video"){
-          videos[tKey] = daily[tKey][tid];
-          save(LS.videos, videos);
-          renderVideoWeek();
-        }
-        renderToday();
-        toast(daily[tKey][tid] ? "✔ Marcado" : "Desmarcado");
-      });
-    });
+  // Reparto de los 43 ítems de currículum a lo largo de los 90 días.
+  var curriculumByDay = {
+    1:["f0-facturacion"], 2:["f0-geografia"], 3:["f1-nicho"], 4:["f1-frase"], 5:["f1-numero"], 6:["f1-nichos-extra"],
+    7:["err-1"], 8:["err-2"], 9:["err-3"], 10:["err-4"], 11:["w12-fundamentos"], 12:["err-5"], 13:["w12-vps"], 14:["w12-entregable"],
+    15:["f3-lista"], 16:["f3-precios"], 17:["err-6"], 18:["f3-guion"], 19:["w34-apis"], 20:["err-7"], 21:["f3-visitas"],
+    22:["w34-whatsapp"], 23:["err-8"], 24:["f3-demo"], 25:["f3-cierre"], 26:["final-factura"], 27:["err-9"],
+    28:["w34-entregable","final-hoja"], 29:["final-metrica"],
+    31:["err-10"], 32:["err-11"], 33:["err-12"], 34:["w56-agente"], 36:["w56-rag"], 39:["w56-entregable"],
+    46:["w78-make"], 52:["w78-zapier"],
+    60:["w910-panel"], 66:["w910-deploy"],
+    75:["w1112-producto1"], 79:["w1112-producto2"], 83:["w1112-producto3"]
+  };
+
+  var phaseLabels = {fase0:"Fase 0", fase1:"Fase 1", fase2:"Fase 2", fase3:"Fase 3", errores:"Error a evitar", final:"Antes de cobrar"};
+
+  function getBlockLabel(day){
+    if(day<=2) return "Fase 0 — Antes de empezar";
+    if(day<=6) return "Fase 1 — Qué vendes";
+    if(day<=14) return "Fase 2 · Semanas 1-2 — Fundamentos n8n";
+    if(day<=28) return "Fase 2 · Semanas 3-4 — APIs y datos";
+    if(day<=42) return "Fase 2 · Semanas 5-6 — Agentes IA";
+    if(day<=56) return "Fase 2 · Semanas 7-8 — Make y Zapier";
+    if(day<=70) return "Fase 2 · Semanas 9-10 — Vibe coding";
+    if(day<=84) return "Fase 2 · Semanas 11-12 — Empaquetar";
+    return "Fase 3 — Cierre y checkpoints finales";
   }
 
-  // ---------- VIDEO WEEK ----------
-  function getMonday(d){
-    var day = d.getDay();
-    var diff = (day === 0 ? -6 : 1) - day;
-    var monday = new Date(d);
-    monday.setDate(d.getDate() + diff);
-    monday.setHours(0,0,0,0);
-    return monday;
+  function curriculumMeta(id){
+    var src = document.querySelector('.chk[data-id="'+id+'"]');
+    if(!src) return null;
+    var checklist = src.closest(".checklist");
+    var phase = checklist ? checklist.getAttribute("data-phase") : "";
+    return { html: src.querySelector(".txt").innerHTML, phaseLabel: phaseLabels[phase] || "" };
   }
-  function renderVideoWeek(){
-    var monday = getMonday(new Date());
-    var names = ["L","M","X","J","V","S","D"];
+
+  function dayHabitId(day, taskId){ return "d"+day+"-"+taskId; }
+
+  function allDayItemIds(day){
+    var ids = dailyTasks.map(function(t){ return dayHabitId(day, t.id); });
+    return ids.concat(curriculumByDay[day] || []);
+  }
+
+  function dayDoneCount(day){
+    var ids = allDayItemIds(day);
+    var done = ids.filter(function(id){ return !!progress[id]; }).length;
+    return { done: done, total: ids.length };
+  }
+
+  function isDayComplete(day){
+    var c = dayDoneCount(day);
+    return c.total > 0 && c.done === c.total;
+  }
+
+  // ---------- PLAN DIARIO: render ----------
+  function toggleProgressItem(id, isCurriculum){
+    progress[id] = !progress[id];
+    save(LS.progress, progress);
+    if(isCurriculum){
+      var el = document.querySelector('.chk[data-id="'+id+'"]');
+      if(el) paintCheck(el);
+      renderAll();
+    }
+  }
+
+  function renderPlanDay(){
+    var card = document.getElementById("planCard");
+    if(currentDay > 90){
+      card.innerHTML =
+        '<div class="plan-finished">'+
+          '<div class="big">🎉</div>'+
+          '<h3>¡Has completado los 90 días del plan!</h3>'+
+          '<div class="prose">Si el día 90 tienes un solo cliente pagando 300€/mes, no has fracasado: has validado todo el sistema. A partir de ahora es repetir y subir precio.</div>'+
+        '</div>';
+      renderHistory();
+      return;
+    }
+    if(viewingDay < 1) viewingDay = 1;
+    if(viewingDay > currentDay) viewingDay = currentDay;
+
+    var start = load(LS.start, todayStr());
+    var dateObj = addDays(start, viewingDay - 1);
+    var readonly = viewingDay < currentDay;
+    var doneCount = dayDoneCount(viewingDay);
+    var pct = doneCount.total ? Math.round((doneCount.done/doneCount.total)*100) : 0;
+    var realDay = realCalendarDay();
+
+    var html = '';
+    html += '<div class="day-nav">'+
+      '<div>'+
+        '<div class="dn-title">Día '+viewingDay+' de 90'+(readonly?' <span class="fine">(historial)</span>':'')+'</div>'+
+        '<div class="dn-date">'+fmtDate(dateObj)+' · '+getBlockLabel(viewingDay)+'</div>'+
+      '</div>'+
+      '<div class="dn-arrows">'+
+        '<button class="btn small" id="dayPrev" '+(viewingDay<=1?"disabled":"")+'>← Anterior</button>'+
+        '<button class="btn small" id="dayNext" '+(viewingDay>=currentDay?"disabled":"")+'>Siguiente →</button>'+
+      '</div>'+
+    '</div>';
+
+    if(viewingDay === currentDay){
+      var delta = realDay - currentDay;
+      var paceClass = delta > 0 ? "behind" : (delta < 0 ? "ahead" : "");
+      var paceMsg = delta > 0 ? ("Hoy es " + fmtDate(new Date()) + " (día natural " + realDay + "). Vas " + delta + " día(s) por detrás del calendario — sigue a tu ritmo, lo importante es completar cada día.")
+        : (delta < 0 ? ("Hoy es " + fmtDate(new Date()) + ". Vas " + (-delta) + " día(s) por delante del calendario real, ¡bien!")
+        : ("Hoy es " + fmtDate(new Date()) + ". Vas exactamente al ritmo del calendario."));
+      html += '<div class="day-pace '+paceClass+'">'+paceMsg+'</div>';
+    }
+
+    html += '<div class="phase-progress" style="margin-bottom:12px;"><div class="bar"><i style="width:'+pct+'%;"></i></div><span>'+doneCount.done+'/'+doneCount.total+'</span></div>';
+
+    if(readonly){
+      var hEntry = history.filter(function(h){ return h.day === viewingDay; })[0];
+      html += '<div class="day-banner">✓ Completado'+(hEntry?(' el '+fmtDateTime(hEntry.completedAt)):'')+'</div>';
+    }
+
+    html += '<div class="day-section-label">Hábitos de hoy</div><div class="checklist">';
+    dailyTasks.forEach(function(t){
+      var id = dayHabitId(viewingDay, t.id);
+      var checked = !!progress[id];
+      html += '<label class="chk '+(checked?"checked":"")+' '+(readonly?"readonly":"")+'" data-planitem="'+id+'" data-kind="habit">'+
+        '<input type="checkbox" '+(checked?"checked":"")+' '+(readonly?"disabled":"")+'>'+
+        '<span class="txt">'+t.label+(t.sub?('<small>'+t.sub+'</small>'):'')+'</span>'+
+      '</label>';
+    });
+    html += '</div>';
+
+    var curr = curriculumByDay[viewingDay];
+    if(curr && curr.length){
+      html += '<div class="day-section-label">Tarea específica de esta quincena</div><div class="checklist">';
+      curr.forEach(function(id){
+        var meta = curriculumMeta(id);
+        if(!meta) return;
+        var checked = !!progress[id];
+        html += '<label class="chk '+(checked?"checked":"")+' '+(readonly?"readonly":"")+'" data-planitem="'+id+'" data-kind="curriculum">'+
+          '<input type="checkbox" '+(checked?"checked":"")+' '+(readonly?"disabled":"")+'>'+
+          '<span class="txt">'+meta.html+'<span class="pill-phase">'+meta.phaseLabel+'</span></span>'+
+        '</label>';
+      });
+      html += '</div>';
+    }
+
+    if(!readonly){
+      var ready = isDayComplete(viewingDay);
+      html += '<button class="complete-btn '+(ready?"ready":"notready")+'" id="btnCompleteDay" '+(ready?"":"disabled")+'>'+
+        (ready ? ("✅ Completar Día "+viewingDay+" y pasar al Día "+(viewingDay+1)) : ("Te faltan "+(doneCount.total-doneCount.done)+" tarea(s) para completar el Día "+viewingDay))+
+      '</button>';
+    }
+
+    card.innerHTML = html;
+
+    Array.prototype.slice.call(card.querySelectorAll('.chk[data-planitem]')).forEach(function(el){
+      if(readonly) return;
+      el.querySelector("input").addEventListener("change", function(){
+        var id = el.getAttribute("data-planitem");
+        var isCurriculum = el.getAttribute("data-kind") === "curriculum";
+        toggleProgressItem(id, isCurriculum);
+        renderPlanDay();
+        renderDashboardVideoWidget();
+        toast(progress[id] ? "✔ Marcado" : "Desmarcado");
+      });
+    });
+
+    var prevBtn = document.getElementById("dayPrev");
+    var nextBtn = document.getElementById("dayNext");
+    if(prevBtn) prevBtn.addEventListener("click", function(){ viewingDay = Math.max(1, viewingDay-1); renderPlanDay(); });
+    if(nextBtn) nextBtn.addEventListener("click", function(){ viewingDay = Math.min(currentDay, viewingDay+1); renderPlanDay(); });
+
+    var completeBtn = document.getElementById("btnCompleteDay");
+    if(completeBtn){
+      completeBtn.addEventListener("click", function(){
+        if(!isDayComplete(currentDay)) return;
+        history.push({ day: currentDay, completedAt: new Date().toISOString() });
+        save(LS.history, history);
+        currentDay++;
+        save(LS.currentDay, currentDay);
+        viewingDay = currentDay;
+        renderPlanDay();
+        renderAll();
+        renderDashboardHeader();
+        renderDashboardVideoWidget();
+        toast("✔ Día completado — bienvenido al Día " + Math.min(currentDay,90));
+      });
+    }
+
+    renderHistory();
+  }
+
+  function renderHistory(){
+    var wrap = document.getElementById("planHistory");
+    if(!history.length){
+      wrap.innerHTML = '<div class="empty-hint">Aún no has completado ningún día.</div>';
+      return;
+    }
+    wrap.innerHTML = history.slice().reverse().map(function(h){
+      return '<div class="history-row"><span>Día '+h.day+'</span><span>'+fmtDateTime(h.completedAt)+'</span></div>';
+    }).join("");
+  }
+
+  // ---------- DASHBOARD: vídeos últimos 7 días del plan ----------
+  function renderDashboardVideoWidget(){
     var wrap = document.getElementById("videoWeek");
-    var todayKey = todayStr();
+    var startDay = Math.max(1, currentDay - 6);
+    var endDay = Math.min(currentDay, 90);
     var html = "";
-    for(var i=0;i<7;i++){
-      var d = new Date(monday);
-      d.setDate(monday.getDate()+i);
-      var key = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-      var on = !!videos[key];
-      var isToday = key === todayKey;
-      html += '<div class="video-day '+(on?"on":"")+' '+(isToday?"today":"")+'" data-date="'+key+'">'+
-        '<div class="d">'+names[i]+'</div><div>'+(on?"✓":"—")+'</div>'+
+    for(var n = startDay; n <= endDay; n++){
+      var id = "d"+n+"-d-video";
+      var on = !!progress[id];
+      var editable = (n === currentDay);
+      html += '<div class="video-day '+(on?"on":"")+' '+(editable?"today":"")+'" data-day="'+n+'" style="cursor:'+(editable?"pointer":"default")+';opacity:'+(editable?1:.65)+';">'+
+        '<div class="d">Día '+n+'</div><div>'+(on?"✓":"—")+'</div>'+
       '</div>';
     }
-    wrap.innerHTML = html;
+    wrap.innerHTML = html || '<div class="empty-hint">—</div>';
     Array.prototype.slice.call(wrap.querySelectorAll(".video-day")).forEach(function(el){
       el.addEventListener("click", function(){
-        var key = el.getAttribute("data-date");
-        videos[key] = !videos[key];
-        save(LS.videos, videos);
-        if(key === todayStr()){
-          if(!daily[key]) daily[key] = {};
-          daily[key]["d-video"] = videos[key];
-          save(LS.daily, daily);
-          renderToday();
-        }
-        renderVideoWeek();
+        var n = parseInt(el.getAttribute("data-day"), 10);
+        if(n !== currentDay) return;
+        var id = "d"+n+"-d-video";
+        progress[id] = !progress[id];
+        save(LS.progress, progress);
+        renderDashboardVideoWidget();
+        renderPlanDay();
       });
     });
   }
@@ -993,10 +1176,11 @@
   // ---------- EXPORT / IMPORT ----------
   function doExport(){
     var data = {
+      version: 2,
       progress: progress,
       start: load(LS.start, null),
-      videos: videos,
-      daily: daily,
+      currentDay: currentDay,
+      history: history,
       theme: load(LS.theme, null),
       exportedAt: new Date().toISOString()
     };
@@ -1026,18 +1210,19 @@
       try{
         var data = JSON.parse(ev.target.result);
         progress = data.progress || {};
-        videos = data.videos || {};
-        daily = data.daily || {};
+        currentDay = data.currentDay || 1;
+        history = data.history || [];
         save(LS.progress, progress);
-        save(LS.videos, videos);
-        save(LS.daily, daily);
+        save(LS.currentDay, currentDay);
+        save(LS.history, history);
         if(data.start){ save(LS.start, data.start); startDateInput.value = data.start; }
         if(data.theme){ save(LS.theme, data.theme); applyTheme(data.theme); }
         allChecks.forEach(paintCheck);
+        viewingDay = currentDay;
         renderAll();
         renderDashboardHeader();
-        renderToday();
-        renderVideoWeek();
+        renderPlanDay();
+        renderDashboardVideoWidget();
         toast("Progreso restaurado");
       }catch(err){
         toast("Error: archivo no válido");
@@ -1048,7 +1233,7 @@
   });
 
   document.getElementById("btnReset").addEventListener("click", function(){
-    if(confirm("¿Seguro que quieres borrar TODO tu progreso? Esta acción no se puede deshacer.")){
+    if(confirm("¿Seguro que quieres borrar TODO tu progreso, incluido el día en el que vas? Esta acción no se puede deshacer.")){
       Object.keys(LS).forEach(function(k){ localStorage.removeItem(LS[k]); });
       location.reload();
     }
@@ -1057,8 +1242,8 @@
   // ---------- INIT ----------
   renderAll();
   renderDashboardHeader();
-  renderToday();
-  renderVideoWeek();
+  renderPlanDay();
+  renderDashboardVideoWidget();
   updateActiveNav();
 })();
 </script>

@@ -5,10 +5,12 @@ Aplicación de una sola página (`index.html`) para seguir tu progreso en el pla
 ## Cómo usarla
 
 - Abre `index.html` con doble clic en cualquier navegador (Chrome, Edge, Safari...). No necesita internet ni instalación.
-- Marca cada checkbox a medida que completas tareas y entregables. El progreso se guarda automáticamente en el `localStorage` de tu navegador.
-- La pestaña **Hoy** tiene tu checklist diario según tu horario (técnico, gimnasio, captación, Python, vídeo), y un tracker semanal de vídeos grabados (meta: 7/semana).
-- En **Ajustes** puedes fijar tu fecha de inicio real del plan: la app calcula tu día actual, la semana de currículum en la que deberías estar, y la cuenta atrás hasta los checkpoints de los días 30, 60 y 90.
-- Usa **Exportar** de vez en cuando para descargar un backup en JSON de todo tu progreso (útil si cambias de navegador/dispositivo). **Importar** restaura ese backup.
+- La pestaña **Plan diario** es la pantalla principal: muestra el "Día N de 90" en el que estás, con tus hábitos de hoy (técnico, gimnasio, captación, Python, vídeo) y la tarea específica de esa quincena del currículum (si toca ese día). El Día 1 es tu fecha de inicio (por defecto, el día que abras la app por primera vez).
+- Cuando marcas **todas** las tareas del día, se habilita el botón "Completar Día N y pasar al Día N+1": al pulsarlo, ese día queda archivado en el Historial y la app genera automáticamente el checklist del día siguiente, en blanco. Así el plan avanza a tu ritmo real, no al del calendario — si un día no llegas a todo, simplemente sigues en ese mismo número hasta completarlo.
+- Puedes navegar con las flechas "← Anterior / Siguiente →" para revisar (en solo lectura) cualquier día ya completado; no se puede avanzar más allá del día actual.
+- Marcar una tarea de currículum desde el Plan diario también la marca en su pestaña de **Fase** correspondiente (Fase 0-3, Errores, Antes de cobrar), que quedan como referencia con todo el contenido explicado — y viceversa.
+- En **Ajustes** puedes cambiar la fecha de inicio (recalcula fechas mostradas, no tu progreso) y ver la cuenta atrás hasta los checkpoints de los días 30, 60 y 90 en la pestaña **Checkpoints**.
+- Usa **Exportar** de vez en cuando para descargar un backup en JSON de todo tu progreso, incluido el día en el que vas (útil si cambias de navegador/dispositivo). **Importar** restaura ese backup.
 
 ## Alojarla online (opcional)
 
