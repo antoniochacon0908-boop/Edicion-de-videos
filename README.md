@@ -21,3 +21,15 @@ Si prefieres tener una URL en vez de abrir el archivo local, puedes activar GitH
 - Sin frameworks ni build step: HTML + CSS + JS vainilla en un único archivo.
 - Tema claro/oscuro automático según el sistema, con toggle manual.
 - Todo el contenido del roadmap (fases, semanas, precios, errores a evitar, checkpoints) está incluido en la propia página.
+
+## Claude Code skills incluidas
+
+Este repositorio incluye las [n8n-skills](https://github.com/czlonkowski/n8n-skills) instaladas como skills de proyecto en `.claude/skills/`, junto con la capa de hooks (`.claude/hooks/` + `.claude/settings.json`) que las activa automáticamente en Claude Code. Enseñan a Claude a construir workflows de n8n usando el servidor MCP [n8n-mcp](https://github.com/czlonkowski/n8n-mcp).
+
+- Requiere el MCP server `n8n-mcp` configurado en `.mcp.json` (ver plantilla en `.mcp.json.example`).
+- Las skills se activan automáticamente por descripción al trabajar con n8n, workflows, nodos o automatizaciones.
+- Licencia MIT — ver `.claude/skills/LICENSE`.
+
+### Workflows de n8n incluidos
+
+En `n8n-workflows/` hay workflows de n8n listos para importar. Incluye un flujo de **gestión de clientes**: formulario → clasificación automática → Google Sheets → email de respuesta personalizado. Ver [`n8n-workflows/README.md`](n8n-workflows/README.md) para instrucciones de importación y configuración.
