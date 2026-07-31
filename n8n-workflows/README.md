@@ -22,4 +22,4 @@ Flujo:
 
 ### Personalizar la clasificación
 
-La lógica de categorías vive en el nodo `Clasificar y preparar datos` (Code), en los arrays `kwQueja`, `kwSoporte`, `kwPresupuesto` y `kwUrgente`. Añade o quita palabras clave según el vocabulario real de tus clientes. Las plantillas de email (asunto + cuerpo) están en el objeto `plantillas` del mismo nodo.
+La lógica de categorías vive en el nodo `Clasificar y preparar datos` (Code), en el array `reglas` (cada fila es `[categoría, prioridad, palabras clave]`, evaluadas en orden) y en el array de palabras urgentes. Añade o quita palabras clave según el vocabulario real de tus clientes. Los textos de email (asunto + cuerpo) están en el objeto `textos` del mismo nodo.
