@@ -1,0 +1,173 @@
+{
+  "name": "Gestión de clientes - Formulario → Google Sheets + email personalizado",
+  "nodes": [
+    {
+      "id": "e5c8f1b6-ad7e-4a3c-8f5b-6c9d1e3a7b54",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-160, -220],
+      "parameters": {
+        "width": 520,
+        "height": 300,
+        "content": "## Antes de activar\n\n1. **Google Sheets**: abre el nodo \"Guardar en Google Sheets\", conecta tu credencial OAuth2 y selecciona (o crea) la hoja de cálculo y la pestaña de destino con las columnas: Fecha, Nombre, Email, Teléfono, Empresa, Categoría, Prioridad, Mensaje.\n2. **Gmail**: abre el nodo \"Enviar email personalizado\" y conecta tu credencial de Gmail OAuth2 (o cámbialo por el nodo \"Send Email\" si prefieres SMTP).\n3. Revisa los campos del formulario en \"Formulario de contacto\" y ajústalos a tu negocio.\n4. Ejecuta una prueba con datos reales antes de activar el workflow (botón \"Test workflow\")."
+      }
+    },
+    {
+      "id": "a1e4b7d2-6f3a-4c9e-8b1d-2e5f7a9c3d10",
+      "name": "Formulario de contacto",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [-160, 200],
+      "webhookId": "gestion-clientes-formulario",
+      "parameters": {
+        "formTitle": "Formulario de gestión de clientes",
+        "formDescription": "Cuéntanos qué necesitas y te responderemos lo antes posible.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre completo",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Teléfono",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Empresa",
+              "fieldType": "text",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "¿En qué podemos ayudarte?",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "respondWith": "text",
+              "formSubmittedText": "¡Gracias! Hemos recibido tu mensaje y te responderemos muy pronto por email."
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "b2f5c8e3-7a4b-4d0f-9c2e-3f6a8b0d4e21",
+      "name": "Clasificar y preparar datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [80, 200],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const input = $input.first().json;\n\nconst nombre = input['Nombre completo'] || '';\nconst email = input['Email'] || '';\nconst telefono = input['Teléfono'] || '';\nconst empresa = input['Empresa'] || '';\nconst mensaje = input['¿En qué podemos ayudarte?'] || '';\n\nconst texto = mensaje.toLowerCase();\n\nfunction includesAny(text, list) {\n  return list.some((k) => text.includes(k));\n}\n\nconst kwQueja = ['queja', 'reclamo', 'reclamacion', 'reclamación', 'insatisfech', 'mal servicio', 'decepcionad', 'molest'];\nconst kwSoporte = ['problema', 'error', 'no funciona', 'falla', 'fallo', 'soporte', 'incidencia', 'ayuda con'];\nconst kwPresupuesto = ['presupuesto', 'cotizacion', 'cotización', 'precio', 'coste', 'costo', 'tarifa', 'plan'];\nconst kwUrgente = ['urgente', 'inmediato', 'lo antes posible', 'hoy mismo', 'cuanto antes'];\n\nlet categoria = 'Información general';\nlet prioridad = 'Baja';\n\nif (includesAny(texto, kwQueja)) {\n  categoria = 'Reclamación';\n  prioridad = 'Alta';\n} else if (includesAny(texto, kwSoporte)) {\n  categoria = 'Soporte técnico';\n  prioridad = includesAny(texto, kwUrgente) ? 'Alta' : 'Media';\n} else if (includesAny(texto, kwPresupuesto)) {\n  categoria = 'Presupuesto / Cotización';\n  prioridad = 'Media';\n}\n\nif (includesAny(texto, kwUrgente) && prioridad !== 'Alta') {\n  prioridad = 'Alta';\n}\n\nconst plantillas = {\n  'Presupuesto / Cotización': {\n    asunto: `${nombre}, aquí tienes la información sobre tu presupuesto`,\n    cuerpo: `Hola ${nombre},\\n\\nGracias por contactarnos y por el interés en nuestros servicios${empresa ? ' para ' + empresa : ''}.\\n\\nHemos recibido tu solicitud de presupuesto y nuestro equipo comercial ya la está revisando. Te enviaremos una propuesta personalizada en menos de 24-48 horas laborables.\\n\\nSi mientras tanto quieres añadir algún detalle a tu solicitud, simplemente responde a este correo.\\n\\nUn saludo,\\nEl equipo`,\n  },\n  'Soporte técnico': {\n    asunto: `${nombre}, hemos recibido tu incidencia`,\n    cuerpo: `Hola ${nombre},\\n\\nGracias por avisarnos. Hemos registrado tu incidencia y nuestro equipo técnico ya está trabajando en ella.\\n\\nNos pondremos en contacto contigo lo antes posible${telefono ? ' al número ' + telefono : ''} para resolverlo.\\n\\nUn saludo,\\nEl equipo`,\n  },\n  'Reclamación': {\n    asunto: `${nombre}, lamentamos los inconvenientes`,\n    cuerpo: `Hola ${nombre},\\n\\nSentimos mucho la experiencia que nos cuentas. Tu mensaje ha sido trasladado a un responsable, que se pondrá en contacto contigo en las próximas horas para resolverlo.\\n\\nGracias por tu paciencia y por darnos la oportunidad de solucionarlo.\\n\\nUn saludo,\\nEl equipo`,\n  },\n  'Información general': {\n    asunto: `${nombre}, gracias por contactarnos`,\n    cuerpo: `Hola ${nombre},\\n\\nGracias por escribirnos. Hemos recibido tu mensaje y te responderemos personalmente en breve con la información que necesitas.\\n\\nUn saludo,\\nEl equipo`,\n  },\n};\n\nconst plantilla = plantillas[categoria];\n\nreturn [\n  {\n    json: {\n      nombre,\n      email,\n      telefono,\n      empresa,\n      mensaje,\n      categoria,\n      prioridad,\n      fecha: new Date().toISOString(),\n      emailAsunto: plantilla.asunto,\n      emailCuerpo: plantilla.cuerpo,\n    },\n  },\n];"
+      }
+    },
+    {
+      "id": "c3a6d9f4-8b5c-4e1a-ad3f-4a7b9c1e5f32",
+      "name": "Guardar en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [320, 200],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "value": {
+            "Fecha": "={{ $json.fecha }}",
+            "Nombre": "={{ $json.nombre }}",
+            "Email": "={{ $json.email }}",
+            "Teléfono": "={{ $json.telefono }}",
+            "Empresa": "={{ $json.empresa }}",
+            "Categoría": "={{ $json.categoria }}",
+            "Prioridad": "={{ $json.prioridad }}",
+            "Mensaje": "={{ $json.mensaje }}"
+          }
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "d4b7e0a5-9c6d-4f2b-be4a-5b8c0d2f6a43",
+      "name": "Enviar email personalizado",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [560, 200],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.emailAsunto }}",
+        "emailType": "text",
+        "message": "={{ $json.emailCuerpo }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Formulario de contacto": {
+      "main": [
+        [
+          {
+            "node": "Clasificar y preparar datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificar y preparar datos": {
+      "main": [
+        [
+          {
+            "node": "Guardar en Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar en Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Enviar email personalizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false
+}

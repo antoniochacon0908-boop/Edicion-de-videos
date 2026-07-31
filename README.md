@@ -29,3 +29,7 @@ Este repositorio incluye las [n8n-skills](https://github.com/czlonkowski/n8n-ski
 - Requiere el MCP server `n8n-mcp` configurado en `.mcp.json` (ver plantilla en `.mcp.json.example`).
 - Las skills se activan automáticamente por descripción al trabajar con n8n, workflows, nodos o automatizaciones.
 - Licencia MIT — ver `.claude/skills/LICENSE`.
+
+### Workflows de n8n incluidos
+
+En `n8n-workflows/` hay workflows de n8n listos para importar. Incluye un flujo de **gestión de clientes**: formulario → clasificación automática → Google Sheets → email de respuesta personalizado. Ver [`n8n-workflows/README.md`](n8n-workflows/README.md) para instrucciones de importación y configuración.
