@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS — Asistente personal</title>
+<style>
+  :root{
+    --bg:#04060a;
+    --bg-panel:#0a0f18;
+    --bg-elev:#0e1420;
+    --border:#1c2836;
+    --border-glow:#2a4a63;
+    --text:#e7f3fb;
+    --text-dim:#8fa3b8;
+    --text-faint:#5c6f82;
+    --cyan:#3ddcff;
+    --cyan-dim:#1a8fb0;
+    --amber:#ffb648;
+    --danger:#ff5c7a;
+    --radius:16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);height:100%;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(61,220,255,.12), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(61,220,255,.06), transparent),
+      var(--bg);
+  }
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+
+  .app{max-width:640px;margin:0 auto;padding:22px 18px 30px;display:flex;flex-direction:column;min-height:100vh;}
+
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .brand h1{margin:0;font-size:15px;letter-spacing:.14em;font-weight:700;color:var(--cyan);text-shadow:0 0 14px rgba(61,220,255,.4);}
+  .brand .sub{font-size:10.5px;color:var(--text-faint);letter-spacing:.04em;}
+  .iconbtn{
+    width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elev);
+    color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;
+    transition:.15s;
+  }
+  .iconbtn:hover{border-color:var(--border-glow);color:var(--cyan);}
+
+  .banner{
+    background:rgba(255,182,72,.1);border:1px solid rgba(255,182,72,.3);color:var(--amber);
+    font-size:12px;padding:9px 12px;border-radius:10px;margin:10px 0;line-height:1.5;display:none;
+  }
+  .banner.show{display:block;}
+
+  .orb-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 0 14px;}
+  .orb{
+    width:132px;height:132px;border-radius:50%;position:relative;cursor:pointer;
+    background:radial-gradient(circle at 35% 30%, rgba(61,220,255,.9), rgba(20,60,80,.4) 60%, rgba(10,20,30,.2) 100%);
+    border:1.5px solid var(--border-glow);
+    box-shadow:0 0 30px rgba(61,220,255,.25), inset 0 0 30px rgba(61,220,255,.15);
+    display:flex;align-items:center;justify-content:center;
+    transition:box-shadow .2s;
+  }
+  .orb:hover{box-shadow:0 0 40px rgba(61,220,255,.4), inset 0 0 30px rgba(61,220,255,.2);}
+  .orb svg{width:40px;height:40px;fill:none;stroke:#04141c;stroke-width:2;}
+  .orb.listening{animation:pulseListen 1.3s infinite;}
+  .orb.speaking{animation:pulseSpeak .55s infinite;}
+  .orb.thinking{animation:pulseThink 1.8s infinite;}
+  @keyframes pulseListen{
+    0%{box-shadow:0 0 0 0 rgba(61,220,255,.55),0 0 30px rgba(61,220,255,.3);}
+    70%{box-shadow:0 0 0 26px rgba(61,220,255,0),0 0 30px rgba(61,220,255,.3);}
+    100%{box-shadow:0 0 0 0 rgba(61,220,255,0),0 0 30px rgba(61,220,255,.3);}
+  }
+  @keyframes pulseSpeak{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.05);}
+  }
+  @keyframes pulseThink{
+    0%,100%{opacity:.7;}
+    50%{opacity:1;}
+  }
+  .orb-status{margin-top:14px;font-size:12.5px;color:var(--text-dim);letter-spacing:.02em;min-height:16px;}
+  .orb-status b{color:var(--cyan);font-weight:600;}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:6px 0 4px;}
+  .chip{
+    font-size:11.5px;color:var(--text-dim);background:var(--bg-elev);border:1px solid var(--border);
+    padding:6px 12px;border-radius:20px;cursor:pointer;transition:.15s;
+  }
+  .chip:hover{border-color:var(--border-glow);color:var(--cyan);}
+
+  .transcript{
+    flex:1;background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px;margin-top:16px;overflow-y:auto;max-height:44vh;min-height:180px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .msg{display:flex;flex-direction:column;max-width:82%;font-size:13.5px;line-height:1.5;}
+  .msg.user{align-self:flex-end;align-items:flex-end;}
+  .msg.jarvis{align-self:flex-start;align-items:flex-start;}
+  .msg .bubble{padding:9px 13px;border-radius:14px;}
+  .msg.user .bubble{background:rgba(61,220,255,.14);border:1px solid rgba(61,220,255,.3);border-bottom-right-radius:4px;}
+  .msg.jarvis .bubble{background:var(--bg-elev);border:1px solid var(--border);border-bottom-left-radius:4px;}
+  .msg .who{font-size:10px;color:var(--text-faint);margin:0 4px 3px;text-transform:uppercase;letter-spacing:.05em;}
+  .empty-hint{color:var(--text-faint);font-size:12.5px;text-align:center;margin:auto;padding:20px;}
+
+  .composer{display:flex;gap:8px;margin-top:12px;}
+  .composer input{
+    flex:1;background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;color:var(--text);
+    padding:12px 14px;font-size:13.5px;font-family:inherit;
+  }
+  .composer input:focus{outline:none;border-color:var(--border-glow);}
+  .composer button{
+    background:var(--cyan);border:none;color:#04141c;font-weight:700;border-radius:12px;
+    padding:0 16px;cursor:pointer;font-size:13px;
+  }
+  .composer button:hover{filter:brightness(1.08);}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,4,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:var(--bg-panel);border:1px solid var(--border-glow);border-radius:var(--radius);
+    padding:22px;max-width:420px;width:100%;max-height:86vh;overflow-y:auto;
+  }
+  .modal h2{margin:0 0 14px;font-size:15px;color:var(--cyan);}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+  .field .desc{font-size:11px;color:var(--text-faint);margin-top:5px;line-height:1.5;}
+  .field input[type="text"], .field input[type="password"], .field select{
+    width:100%;background:var(--bg-elev);border:1px solid var(--border);border-radius:9px;color:var(--text);
+    padding:9px 11px;font-size:13px;font-family:inherit;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--border-glow);}
+  .modal-actions{display:flex;gap:8px;margin-top:18px;}
+  .btn{
+    flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elev);
+    color:var(--text);font-size:12.5px;cursor:pointer;text-align:center;
+  }
+  .btn:hover{border-color:var(--border-glow);}
+  .btn.primary{background:var(--cyan);color:#04141c;border-color:var(--cyan);font-weight:700;}
+  .btn.danger{color:var(--danger);}
+  hr.sep{border:none;border-top:1px solid var(--border);margin:16px 0;}
+  .fine{font-size:11px;color:var(--text-faint);line-height:1.6;}
+
+  .list-mini{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+  .list-mini .row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--text-dim);background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;padding:7px 10px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <h1 id="assistantName">JARVIS</h1>
+        <div class="sub">Asistente personal</div>
+      </div>
+    </div>
+    <button class="iconbtn" id="btnSettings" title="Ajustes">⚙️</button>
+  </header>
+
+  <div class="banner" id="unsupportedBanner">Tu navegador no soporta reconocimiento de voz (usa Chrome o Edge). Puedes seguir escribiéndome ahí abajo, sin problema.</div>
+  <div class="banner" id="micDeniedBanner">No he podido acceder al micrófono. Revisa los permisos del navegador, o sigue escribiéndome.</div>
+
+  <div class="orb-zone">
+    <div class="orb" id="orb">
+      <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-2.08A7 7 0 0019 12h-2z"/></svg>
+    </div>
+    <div class="orb-status" id="orbStatus">Pulsa el círculo para hablar</div>
+  </div>
+
+  <div class="chips">
+    <div class="chip" data-cmd="qué hora es">🕐 Hora</div>
+    <div class="chip" data-cmd="ayuda">❓ Ayuda</div>
+    <div class="chip" data-cmd="mis notas">📝 Notas</div>
+    <div class="chip" data-cmd="mis recordatorios">⏰ Recordatorios</div>
+  </div>
+
+  <div class="transcript" id="transcript">
+    <div class="empty-hint" id="emptyHint">Di "hola" o escribe algo abajo para empezar.</div>
+  </div>
+
+  <div class="composer">
+    <input type="text" id="textInput" placeholder="Escríbeme si no quieres hablar..." autocomplete="off">
+    <button id="btnSend">Enviar</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <h2>⚙️ Ajustes de Jarvis</h2>
+
+    <div class="field">
+      <label>Nombre del asistente</label>
+      <input type="text" id="setName" placeholder="Jarvis">
+    </div>
+
+    <div class="field">
+      <label>Voz (texto a voz)</label>
+      <select id="setVoice"><option value="">Voz por defecto del navegador</option></select>
+    </div>
+
+    <hr class="sep">
+
+    <div class="field">
+      <label>Clave de API de Claude (opcional)</label>
+      <input type="password" id="setApiKey" placeholder="sk-ant-...">
+      <div class="desc">
+        Sin clave, Jarvis solo responde a comandos conocidos (hora, notas, recordatorios, temporizador...). Con tu clave, también responde preguntas abiertas usando el modelo de Claude.
+        La clave se guarda solo en este navegador (<code>localStorage</code>) y se envía directamente desde tu navegador a la API de Anthropic — nunca pasa por ningún servidor intermedio. Consíguela en
+        <span style="color:var(--cyan);">console.anthropic.com</span>, y si vas a dejarla guardada aquí, ponle un límite de gasto.
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Modelo</label>
+      <select id="setModel">
+        <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (rápido y barato)</option>
+        <option value="claude-sonnet-5">Claude Sonnet 5 (más capaz)</option>
+      </select>
+    </div>
+
+    <hr class="sep">
+
+    <div class="field">
+      <label>Notas guardadas (<span id="notesCount">0</span>)</label>
+      <div class="list-mini" id="notesList"></div>
+    </div>
+    <div class="field">
+      <label>Recordatorios (<span id="remindersCount">0</span>)</label>
+      <div class="list-mini" id="remindersList"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn danger" id="btnClearAll">Borrar todo</button>
+      <button class="btn primary" id="btnCloseSettings">Guardar y cerrar</button>
+    </div>
+    <p class="fine">El reconocimiento de voz necesita Chrome o Edge, y normalmente permiso de micrófono sobre HTTPS (o abrir el archivo en local funciona en la mayoría de casos). Los recordatorios solo suenan mientras tengas esta pestaña abierta — no es un despertador en segundo plano.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LS = {
+    settings: "jarvis_settings_v1",
+    notes: "jarvis_notes_v1",
+    reminders: "jarvis_reminders_v1"
+  };
+  function load(key, fallback){
+    try{ var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
+  }
+  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+  var settings = load(LS.settings, { name:"Jarvis", voiceURI:"", apiKey:"", model:"claude-haiku-4-5-20251001" });
+  var notes = load(LS.notes, []);         // [{text, at}]
+  var reminders = load(LS.reminders, []); // [{id, text, due, notified}]
+
+  document.getElementById("assistantName").textContent = (settings.name || "Jarvis").toUpperCase();
+
+  // ---------- TRANSCRIPT ----------
+  var transcriptEl = document.getElementById("transcript");
+  var emptyHint = document.getElementById("emptyHint");
+  function addMessage(who, text){
+    if(emptyHint) { emptyHint.remove(); emptyHint = null; }
+    var wrap = document.createElement("div");
+    wrap.className = "msg " + (who === "user" ? "user" : "jarvis");
+    var label = document.createElement("div");
+    label.className = "who";
+    label.textContent = who === "user" ? "Tú" : (settings.name || "Jarvis");
+    var bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    transcriptEl.appendChild(wrap);
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  }
+
+  // ---------- SPEECH OUTPUT ----------
+  function speak(text){
+    if(!("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "es-ES";
+      if(settings.voiceURI){
+        var v = window.speechSynthesis.getVoices().filter(function(v){ return v.voiceURI === settings.voiceURI; })[0];
+        if(v) utter.voice = v;
+      }
+      utter.onstart = function(){ setOrbState("speaking", "Hablando…"); };
+      utter.onend = function(){ setOrbState("idle", "Pulsa el círculo para hablar"); };
+      window.speechSynthesis.speak(utter);
+    }catch(e){}
+  }
+  function populateVoices(){
+    if(!("speechSynthesis" in window)) return;
+    var voices = window.speechSynthesis.getVoices().filter(function(v){ return v.lang && v.lang.toLowerCase().indexOf("es") === 0; });
+    var sel = document.getElementById("setVoice");
+    var current = sel.value;
+    sel.innerHTML = '<option value="">Voz por defecto del navegador</option>' + voices.map(function(v){
+      return '<option value="'+v.voiceURI+'">'+v.name+' ('+v.lang+')</option>';
+    }).join("");
+    sel.value = settings.voiceURI || "";
+  }
+  if("speechSynthesis" in window){
+    populateVoices();
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+  }
+
+  // ---------- ORB STATE ----------
+  var orb = document.getElementById("orb");
+  var orbStatus = document.getElementById("orbStatus");
+  function setOrbState(state, statusText){
+    orb.classList.remove("listening", "speaking", "thinking");
+    if(state !== "idle") orb.classList.add(state);
+    orbStatus.innerHTML = statusText;
+  }
+
+  // ---------- SPEECH RECOGNITION ----------
+  var SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recognition = null;
+  var listening = false;
+  if(SpeechRecognitionCtor){
+    recognition = new SpeechRecognitionCtor();
+    recognition.lang = "es-ES";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function(){ listening = true; setOrbState("listening", "Escuchando…"); };
+    recognition.onerror = function(e){
+      listening = false;
+      if(e.error === "not-allowed" || e.error === "service-not-allowed"){
+        document.getElementById("micDeniedBanner").classList.add("show");
+      }
+      setOrbState("idle", "Pulsa el círculo para hablar");
+    };
+    recognition.onend = function(){
+      listening = false;
+      if(!orb.classList.contains("speaking") && !orb.classList.contains("thinking")){
+        setOrbState("idle", "Pulsa el círculo para hablar");
+      }
+    };
+    recognition.onresult = function(e){
+      var text = e.results[0][0].transcript;
+      handleInput(text);
+    };
+  } else {
+    document.getElementById("unsupportedBanner").classList.add("show");
+  }
+
+  orb.addEventListener("click", function(){
+    if(!recognition) return;
+    if(listening){ recognition.stop(); return; }
+    try{ recognition.start(); }catch(e){}
+  });
+
+  // ---------- TEXT INPUT FALLBACK ----------
+  var textInput = document.getElementById("textInput");
+  document.getElementById("btnSend").addEventListener("click", sendTextInput);
+  textInput.addEventListener("keydown", function(e){ if(e.key === "Enter") sendTextInput(); });
+  function sendTextInput(){
+    var val = textInput.value.trim();
+    if(!val) return;
+    textInput.value = "";
+    handleInput(val);
+  }
+
+  document.querySelectorAll(".chip").forEach(function(chip){
+    chip.addEventListener("click", function(){ handleInput(chip.getAttribute("data-cmd")); });
+  });
+
+  // ---------- HELP TEXT ----------
+  function helpText(){
+    return "Puedo: decirte la hora y la fecha, tomar notas (\"añade una nota: ...\"), listar tus notas (\"mis notas\"), poner recordatorios (\"recuérdame llamar al cliente en 20 minutos\" o \"a las 18:30\"), poner un temporizador (\"temporizador de 10 minutos\"), y si me das una clave de API en Ajustes, también respondo preguntas abiertas.";
+  }
+
+  // ---------- COMMAND HANDLING ----------
+  function handleInput(rawText){
+    addMessage("user", rawText);
+    var t = rawText.toLowerCase().trim();
+    var reply = null;
+
+    if(/^(hola|buenas|hey|ey|qu[eé] tal)\b/.test(t)){
+      reply = "Hola. ¿En qué puedo ayudarte?";
+    } else if(/qu[eé] hora es/.test(t)){
+      reply = "Son las " + new Date().toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit"}) + ".";
+    } else if(/qu[eé] (d[ií]a|fecha) es/.test(t)){
+      reply = "Hoy es " + capitalize(new Date().toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long", year:"numeric"})) + ".";
+    } else if(/(qu[eé] puedes hacer|ay[uú]da|comandos)/.test(t)){
+      reply = helpText();
+    } else if(/^gracias/.test(t)){
+      reply = "De nada.";
+    } else if(/^(a[ñn]ade|apunta|crea|guarda)( una)? nota[:\s]+(.+)/i.test(rawText)){
+      var m = rawText.match(/^(a[ñn]ade|apunta|crea|guarda)( una)? nota[:\s]+(.+)/i);
+      var noteText = m[3].trim();
+      notes.push({ text: noteText, at: new Date().toISOString() });
+      save(LS.notes, notes);
+      renderLists();
+      reply = "Nota guardada: " + noteText;
+    } else if(/(mis notas|listar? notas|qu[eé] notas tengo)/.test(t)){
+      reply = notes.length ? ("Tienes " + notes.length + " nota(s): " + notes.map(function(n){ return n.text; }).join(" · ")) : "No tienes notas guardadas.";
+    } else if(/(borra|elimina|limpia)( todas)?( las)? notas/.test(t)){
+      notes = [];
+      save(LS.notes, notes);
+      renderLists();
+      reply = "He borrado todas tus notas.";
+    } else if(/^recu[eé]rdame (.+?) en (\d+) ?minutos?$/i.test(rawText)){
+      var mm = rawText.match(/^recu[eé]rdame (.+?) en (\d+) ?minutos?$/i);
+      var due = new Date(Date.now() + parseInt(mm[2],10) * 60000);
+      addReminder(mm[1].trim(), due);
+      reply = "Vale, te recordaré \"" + mm[1].trim() + "\" en " + mm[2] + " minutos, a las " + due.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}) + ".";
+    } else if(/^recu[eé]rdame (.+?) a las (\d{1,2})[:h.]?(\d{2})?$/i.test(rawText)){
+      var m2 = rawText.match(/^recu[eé]rdame (.+?) a las (\d{1,2})[:h.]?(\d{2})?$/i);
+      var h = parseInt(m2[2],10), min = m2[3] ? parseInt(m2[3],10) : 0;
+      var d = new Date();
+      d.setHours(h, min, 0, 0);
+      if(d.getTime() < Date.now()) d.setDate(d.getDate()+1);
+      addReminder(m2[1].trim(), d);
+      reply = "Recordatorio puesto: \"" + m2[1].trim() + "\" a las " + d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}) + (d.getDate() !== new Date().getDate() ? " (mañana)" : "") + ".";
+    } else if(/(mis recordatorios|qu[eé] recordatorios tengo)/.test(t)){
+      var pending = reminders.filter(function(r){ return !r.notified; });
+      reply = pending.length ? ("Tienes " + pending.length + " pendiente(s): " + pending.map(function(r){ return r.text + " (" + new Date(r.due).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}) + ")"; }).join(" · ")) : "No tienes recordatorios pendientes.";
+    } else if(/(borra|elimina|cancela)( todos)?( los)? recordatorios/.test(t)){
+      reminders = [];
+      save(LS.reminders, reminders);
+      renderLists();
+      reply = "He cancelado todos tus recordatorios.";
+    } else if(/^temporizador de (\d+) ?minutos?$/i.test(rawText)){
+      var tm = rawText.match(/^temporizador de (\d+) ?minutos?$/i);
+      var mins = parseInt(tm[1],10);
+      startTimer(mins);
+      reply = "Temporizador de " + mins + " minutos en marcha.";
+    } else {
+      if(settings.apiKey){
+        askClaude(rawText);
+        return;
+      }
+      reply = "No tengo un comando local para eso. Di \"ayuda\" para ver lo que sé hacer, o añade tu clave de API de Claude en Ajustes para que responda cualquier pregunta.";
+    }
+
+    addMessage("jarvis", reply);
+    speak(reply);
+  }
+
+  function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ---------- REMINDERS ----------
+  function addReminder(text, dueDate){
+    reminders.push({ id: Date.now()+"", text: text, due: dueDate.toISOString(), notified: false });
+    save(LS.reminders, reminders);
+    renderLists();
+  }
+  function checkReminders(){
+    var now = Date.now();
+    var changed = false;
+    reminders.forEach(function(r){
+      if(!r.notified && new Date(r.due).getTime() <= now){
+        r.notified = true;
+        changed = true;
+        var msg = "Recordatorio: " + r.text;
+        addMessage("jarvis", msg);
+        speak(msg);
+        if("Notification" in window && Notification.permission === "granted"){
+          try{ new Notification(settings.name || "Jarvis", { body: r.text }); }catch(e){}
+        }
+      }
+    });
+    if(changed) save(LS.reminders, reminders);
+  }
+  setInterval(checkReminders, 15000);
+  if("Notification" in window && Notification.permission === "default"){
+    try{ Notification.requestPermission(); }catch(e){}
+  }
+
+  // ---------- TIMER ----------
+  var activeTimer = null;
+  function startTimer(minutes){
+    if(activeTimer) clearTimeout(activeTimer);
+    activeTimer = setTimeout(function(){
+      var msg = "¡Se ha acabado el temporizador de " + minutes + " minutos!";
+      addMessage("jarvis", msg);
+      speak(msg);
+      activeTimer = null;
+    }, minutes * 60000);
+  }
+
+  // ---------- CLAUDE API (BYOK, opcional) ----------
+  function askClaude(userText){
+    setOrbState("thinking", "Pensando…");
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": settings.apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: settings.model || "claude-haiku-4-5-20251001",
+        max_tokens: 400,
+        system: "Eres " + (settings.name || "Jarvis") + ", un asistente de voz personal. Respondes en español, de forma breve y natural (2-4 frases cortas), como si hablaras en voz alta, sin markdown ni listas.",
+        messages: [{ role: "user", content: userText }]
+      })
+    }).then(function(res){
+      if(!res.ok) return res.text().then(function(t){ throw new Error("HTTP " + res.status + ": " + t.slice(0,120)); });
+      return res.json();
+    }).then(function(data){
+      var text = (data.content && data.content[0] && data.content[0].text) || "No he podido generar una respuesta.";
+      setOrbState("idle", "Pulsa el círculo para hablar");
+      addMessage("jarvis", text);
+      speak(text);
+    }).catch(function(err){
+      setOrbState("idle", "Pulsa el círculo para hablar");
+      var msg = "No he podido conectar con la IA (" + err.message + "). Revisa tu clave en Ajustes.";
+      addMessage("jarvis", msg);
+      speak(msg);
+    });
+  }
+
+  // ---------- SETTINGS MODAL ----------
+  var overlay = document.getElementById("settingsOverlay");
+  function openSettings(){
+    document.getElementById("setName").value = settings.name || "";
+    document.getElementById("setApiKey").value = settings.apiKey || "";
+    document.getElementById("setModel").value = settings.model || "claude-haiku-4-5-20251001";
+    populateVoices();
+    renderLists();
+    overlay.classList.add("show");
+  }
+  function closeSettings(){
+    settings.name = document.getElementById("setName").value.trim() || "Jarvis";
+    settings.voiceURI = document.getElementById("setVoice").value;
+    settings.apiKey = document.getElementById("setApiKey").value.trim();
+    settings.model = document.getElementById("setModel").value;
+    save(LS.settings, settings);
+    document.getElementById("assistantName").textContent = settings.name.toUpperCase();
+    overlay.classList.remove("show");
+  }
+  document.getElementById("btnSettings").addEventListener("click", openSettings);
+  document.getElementById("btnCloseSettings").addEventListener("click", closeSettings);
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeSettings(); });
+
+  document.getElementById("btnClearAll").addEventListener("click", function(){
+    if(confirm("¿Borrar todas las notas, recordatorios y tu clave de API guardados en este navegador?")){
+      notes = []; reminders = []; settings = { name:"Jarvis", voiceURI:"", apiKey:"", model:"claude-haiku-4-5-20251001" };
+      save(LS.notes, notes); save(LS.reminders, reminders); save(LS.settings, settings);
+      location.reload();
+    }
+  });
+
+  function renderLists(){
+    document.getElementById("notesCount").textContent = notes.length;
+    document.getElementById("remindersCount").textContent = reminders.filter(function(r){ return !r.notified; }).length;
+    document.getElementById("notesList").innerHTML = notes.length ? notes.map(function(n,i){
+      return '<div class="row"><span>'+escapeHtml(n.text)+'</span></div>';
+    }).join("") : '<div class="fine">Sin notas.</div>';
+    document.getElementById("remindersList").innerHTML = reminders.filter(function(r){ return !r.notified; }).length ? reminders.filter(function(r){ return !r.notified; }).map(function(r){
+      return '<div class="row"><span>'+escapeHtml(r.text)+'</span><span>'+new Date(r.due).toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+'</span></div>';
+    }).join("") : '<div class="fine">Sin recordatorios.</div>';
+  }
+  function escapeHtml(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  renderLists();
+})();
+</script>
+</body>
+</html>
