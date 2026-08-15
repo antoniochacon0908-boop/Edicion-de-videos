@@ -39,10 +39,11 @@ echo.
 pause
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://open-jarvis.github.io/OpenJarvis/install.ps1 | iex"
+if errorlevel 1 goto :falloInstalador
 
 echo.
 echo ============================================
-echo   HECHO (si no ha salido ningun error arriba)
+echo   HECHO
 echo ============================================
 echo Para usarlo, abre una terminal NUEVA (para que coja el PATH actualizado)
 echo y escribe:
@@ -54,6 +55,21 @@ echo   jarvis skill sync hermes --category research
 echo   jarvis skill list
 echo.
 echo Mas detalle en LEEME.md, en esta misma carpeta.
+echo.
+goto :fin
+
+:falloInstalador
+echo.
+echo ============================================
+echo   EL INSTALADOR OFICIAL HA FALLADO
+echo ============================================
+echo Desplazate hacia arriba en esta misma ventana (rueda del raton o barra de
+echo scroll) y busca la linea en rojo que empieza por [fail]: ese texto dice
+echo el motivo exacto. Copialo tal cual y compartelo para poder ayudarte -
+echo "ha fallado" o "ponia algo" no basta, hay varios motivos posibles.
+echo.
+echo IMPORTANTE: en cuanto pulses una tecla aqui abajo, esta ventana se
+echo cierra. Copia primero el mensaje de [fail], y pulsa una tecla despues.
 echo.
 goto :fin
 
