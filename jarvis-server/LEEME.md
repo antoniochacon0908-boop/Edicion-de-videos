@@ -1,5 +1,34 @@
 # JARVIS — arranque
 
+## Windows: instalación en un clic (recomendado)
+
+1. Crea una carpeta en tu Escritorio (por ejemplo `Jarvis`) y mete ahí dentro **todos** los
+   archivos de este proyecto juntos: `server.js`, `index.html`, `prompt.md`, `.env.example`,
+   `.gitignore`, `package.json`, `instalar.bat`, `iniciar-jarvis-visible.bat` y este `LEEME.md`.
+2. Si no tienes Node instalado, instálalo desde https://nodejs.org (versión LTS) y reinicia el PC.
+3. Haz **doble clic en `instalar.bat`**. Te va a pedir, una por una, tus tres claves (Anthropic,
+   ElevenLabs y el Voice ID) y las guarda por ti en un `.env` en esa misma carpeta — no tienes que
+   tocar ningún archivo a mano.
+4. Al terminar, deja un lanzador (`iniciar-jarvis.vbs`) metido en tu carpeta de Inicio de Windows:
+   a partir de ahora, cada vez que enciendas o inicies sesión en el PC, Jarvis arranca solo y te
+   abre `http://localhost:3000` en el navegador. No hace falta que abras ninguna terminal.
+5. Para probarlo ahora mismo sin reiniciar el PC, haz doble clic en `iniciar-jarvis.vbs` (queda en
+   la misma carpeta). No verás ninguna ventana — arranca en segundo plano y se te abre el navegador solo.
+6. Si algo no funciona y quieres ver el error en pantalla, usa en su lugar `iniciar-jarvis-visible.bat`
+   (ese sí muestra una ventana con lo que va pasando).
+
+**Para parar Jarvis**: como corre oculto, no hay ventana que cerrar. Abre el Administrador de tareas
+(Ctrl+Shift+Esc), busca el proceso "Node.js JavaScript Runtime" y dale a Finalizar tarea.
+
+**Para desactivar el arranque automático**: pulsa `Win+R`, escribe `shell:startup`, Enter, y borra ahí
+el archivo `iniciar-jarvis.vbs`.
+
+**Aviso**: este instalador no lo he podido probar en un Windows real (lo he escrito con cuidado y con
+los patrones estándar de `.bat`, pero no tengo forma de ejecutarlo aquí). Si algo se comporta raro,
+dímelo con el mensaje exacto y lo arreglo.
+
+Si prefieres el camino manual (o estás en Mac/Linux), sigue los pasos de abajo.
+
 ## 1. Node
 
 Comprueba si lo tienes. Abre la terminal y escribe:
