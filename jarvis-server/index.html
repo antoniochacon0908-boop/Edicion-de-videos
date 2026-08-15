@@ -381,6 +381,18 @@
       analyser = null; audioCtx = null; micStream = null;
     }
   }
+
+  // ---------- RECORDATORIOS PENDIENTES ----------
+  // Solo suenan mientras esta pestaña esté abierta y en reposo: no es un aviso en segundo plano del sistema.
+  setInterval(function(){
+    if(state !== STATE.IDLE) return;
+    fetch("/api/reminders/due").then(function(res){ return res.json(); }).then(function(data){
+      if(data && data.text){
+        addMessage("jarvis", data.text);
+        playAudio(data.audio);
+      }
+    }).catch(function(){});
+  }, 20000);
 })();
 </script>
 </body>

@@ -83,10 +83,25 @@ Abre http://localhost:3000 y habla.
 ## Qué es cada archivo
 
 - `index.html` — la cara. Todo lo visual está aquí.
-- `server.js` — el puente. Guarda las claves y habla con Claude y con ElevenLabs.
+- `server.js` — el puente. Guarda las claves, habla con Claude y con ElevenLabs, y ejecuta las skills.
 - `prompt.md` — la personalidad. Edítalo y reinicia el servidor. Aquí es donde de verdad
   se ajusta el asistente: es lo que más cambia el resultado y no requiere tocar código.
 - `.env` — tus secretos. Nunca sale de tu ordenador.
+- `data/` — tus notas, recordatorios y memoria de conversación, en tu ordenador. Se crea sola
+  al usar Jarvis por primera vez. Bórrala si quieres que Jarvis "olvide" todo y empiece de cero.
+
+## Las 3 skills
+
+- **Búsqueda web**: si le preguntas algo que necesita datos actuales, Claude busca en internet
+  por su cuenta antes de contestar. No hay nada que configurar.
+- **Notas y recordatorios**: dile "apunta una nota: ..." o "recuérdame X en 20 minutos" / "a las
+  18:30", y también "qué notas tengo" o "qué recordatorios tengo". Se guardan en `data/` y
+  sobreviven a que reinicies el servidor. Los recordatorios solo suenan mientras tengas esta
+  pestaña del navegador abierta y Jarvis en reposo (no es un aviso en segundo plano del sistema).
+- **Memoria**: Jarvis recuerda tus últimos intercambios (unos 16 turnos) aunque cierres y vuelvas
+  a abrir el servidor — no hace falta que le repitas el contexto. No es memoria infinita: lo más
+  antiguo se va descartando a medida que hablas más con él, para no disparar el coste ni la
+  latencia de cada respuesta.
 
 ## Las palmadas
 
