@@ -59,11 +59,17 @@ Abre http://localhost:3000 y habla.
   se ajusta el asistente: es lo que más cambia el resultado y no requiere tocar código.
 - `.env` — tus secretos. Nunca sale de tu ordenador.
 
-## Las dos palmadas
+## Las palmadas
 
-Pulsa el botón PALMAS una vez para darle permiso de micrófono. A partir de ahí, dos palmadas
-seguidas activan la escucha sin tocar nada.
+Pulsa el botón PALMAS una vez para darle permiso de micrófono. A partir de ahí:
 
-Solo funciona cuando está en reposo, para que no se active con su propia voz. Si tu habitación
-es ruidosa y se dispara solo, sube el `0.28` de `vigilarPalmas` en `index.html`. Si te ignora,
-bájalo. El segundo número, `0.9`, es el margen entre palmada y palmada en segundos.
+- **Dos palmadas seguidas** activan la escucha sin tocar nada.
+- **Tres palmadas seguidas** abren "Should I Stay or Should I Go" (The Clash) en una pestaña de YouTube. No es un botón serio, es un capricho — bórralo de `index.html` (función `abrirCancion`) si molesta.
+
+Solo funciona cuando está en reposo, para que no se active con su propia voz. Como Jarvis tiene que
+esperar a ver si viene una tercera palmada antes de decidir, activar la escucha con dos palmadas
+tarda un poco (el margen de abajo) en confirmarse — es normal, no es que vaya lento.
+
+Si tu habitación es ruidosa y se dispara solo, sube el `0.28` de `vigilarPalmas` en `index.html`.
+Si te ignora, bájalo. El segundo número, `0.9`, es el margen máximo entre una palmada y la siguiente
+de la misma ráfaga, en segundos.

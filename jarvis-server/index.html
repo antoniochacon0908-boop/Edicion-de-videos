@@ -150,8 +150,10 @@
   "use strict";
 
   // ---------- Ajustes de las palmadas (editables) ----------
+  // Dos palmadas seguidas (dentro de "margenPalmas") activan la escucha.
+  // Tres palmadas seguidas abren "Should I Stay or Should I Go" en YouTube.
   var vigilarPalmas = 0.28;   // umbral de volumen (0 a 1) para que un pico cuente como palmada. Súbelo si se dispara solo; bájalo si te ignora.
-  var margenPalmas = 0.9;     // segundos máximo entre la primera y la segunda palmada.
+  var margenPalmas = 0.9;     // segundos máximo entre una palmada y la siguiente de la misma ráfaga.
 
   // ---------- ESTADO ----------
   var STATE = { IDLE: "idle", LISTENING: "listening", THINKING: "thinking", SPEAKING: "speaking" };
@@ -283,11 +285,14 @@
     sendToJarvis(val);
   }
 
-  // ---------- DETECCIÓN DE DOS PALMADAS ----------
+  // ---------- DETECCIÓN DE PALMADAS ----------
+  // Dos palmadas seguidas -> activa la escucha. Tres palmadas seguidas -> abre la canción.
+  var CANCION_URL = "https://www.youtube.com/results?search_query=" + encodeURIComponent("The Clash Should I Stay or Should I Go");
   var audioCtx = null, analyser = null, dataArray = null, rafId = null;
   var wasAboveThreshold = false;
   var lastPeakTime = 0;
-  var firstClapTime = null;
+  var clapCount = 0;
+  var decisionTimer = null;
   var palmasActivas = false;
   var micStream = null;
 
@@ -335,28 +340,41 @@
     var now = performance.now() / 1000;
     if(above && !wasAboveThreshold && (now - lastPeakTime) > 0.15){
       lastPeakTime = now;
-      registrarPalmada(now);
+      registrarPalmada();
     }
     wasAboveThreshold = above;
   }
 
-  function registrarPalmada(now){
-    if(firstClapTime !== null && (now - firstClapTime) <= margenPalmas){
-      firstClapTime = null;
-      startListening();
-    } else {
-      firstClapTime = now;
-    }
+  // Cada palmada reinicia la cuenta atrás de "margenPalmas" segundos. Cuando pasa ese
+  // tiempo sin una palmada nueva, se decide según cuántas hubo seguidas: 2 -> escuchar,
+  // 3 o más -> abrir la canción. Por eso activar la escucha tarda "margenPalmas" en confirmarse.
+  function registrarPalmada(){
+    clapCount++;
+    if(decisionTimer) clearTimeout(decisionTimer);
+    decisionTimer = setTimeout(function(){
+      if(clapCount === 2) startListening();
+      else if(clapCount >= 3) abrirCancion();
+      clapCount = 0;
+      decisionTimer = null;
+    }, margenPalmas * 1000);
+  }
+
+  function abrirCancion(){
+    addMessage("jarvis", "🎵 Ahí va: Should I Stay or Should I Go.");
+    window.open(CANCION_URL, "_blank");
   }
 
   function reanudarEscuchaPalmas(){
     if(!palmasActivas || rafId) return;
     wasAboveThreshold = false;
-    firstClapTime = null;
+    clapCount = 0;
+    if(decisionTimer){ clearTimeout(decisionTimer); decisionTimer = null; }
     loopPalmas();
   }
   function pausarEscuchaPalmas(detener){
     if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+    if(decisionTimer){ clearTimeout(decisionTimer); decisionTimer = null; }
+    clapCount = 0;
     if(detener && micStream){
       micStream.getTracks().forEach(function(t){ t.stop(); });
       if(audioCtx) audioCtx.close();
