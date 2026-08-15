@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS</title>
+<style>
+  :root{
+    --bg:#04060a;
+    --bg-panel:#0a0f18;
+    --bg-elev:#0e1420;
+    --border:#1c2836;
+    --border-glow:#2a4a63;
+    --text:#e7f3fb;
+    --text-dim:#8fa3b8;
+    --text-faint:#5c6f82;
+    --cyan:#3ddcff;
+    --amber:#ffb648;
+    --danger:#ff5c7a;
+    --radius:16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);height:100%;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(61,220,255,.12), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(61,220,255,.06), transparent),
+      var(--bg);
+  }
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+
+  .app{max-width:640px;margin:0 auto;padding:22px 18px 30px;display:flex;flex-direction:column;min-height:100vh;}
+
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .brand h1{margin:0;font-size:15px;letter-spacing:.14em;font-weight:700;color:var(--cyan);text-shadow:0 0 14px rgba(61,220,255,.4);}
+  .brand .sub{font-size:10.5px;color:var(--text-faint);letter-spacing:.04em;}
+
+  .banner{
+    background:rgba(255,182,72,.1);border:1px solid rgba(255,182,72,.3);color:var(--amber);
+    font-size:12px;padding:9px 12px;border-radius:10px;margin:10px 0;line-height:1.5;display:none;
+  }
+  .banner.show{display:block;}
+  .banner.err{background:rgba(255,92,122,.1);border-color:rgba(255,92,122,.35);color:var(--danger);}
+
+  .orb-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0 12px;}
+  .orb{
+    width:132px;height:132px;border-radius:50%;position:relative;cursor:pointer;
+    background:radial-gradient(circle at 35% 30%, rgba(61,220,255,.9), rgba(20,60,80,.4) 60%, rgba(10,20,30,.2) 100%);
+    border:1.5px solid var(--border-glow);
+    box-shadow:0 0 30px rgba(61,220,255,.25), inset 0 0 30px rgba(61,220,255,.15);
+    display:flex;align-items:center;justify-content:center;
+    transition:box-shadow .2s;
+  }
+  .orb:hover{box-shadow:0 0 40px rgba(61,220,255,.4), inset 0 0 30px rgba(61,220,255,.2);}
+  .orb svg{width:40px;height:40px;fill:none;stroke:#04141c;stroke-width:2;}
+  .orb.listening{animation:pulseListen 1.3s infinite;}
+  .orb.speaking{animation:pulseSpeak .55s infinite;}
+  .orb.thinking{animation:pulseThink 1.8s infinite;}
+  @keyframes pulseListen{
+    0%{box-shadow:0 0 0 0 rgba(61,220,255,.55),0 0 30px rgba(61,220,255,.3);}
+    70%{box-shadow:0 0 0 26px rgba(61,220,255,0),0 0 30px rgba(61,220,255,.3);}
+    100%{box-shadow:0 0 0 0 rgba(61,220,255,0),0 0 30px rgba(61,220,255,.3);}
+  }
+  @keyframes pulseSpeak{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+  @keyframes pulseThink{ 0%,100%{opacity:.7;} 50%{opacity:1;} }
+  .orb-status{margin-top:14px;font-size:12.5px;color:var(--text-dim);letter-spacing:.02em;min-height:16px;text-align:center;}
+
+  .clapzone{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 4px;}
+  .btn{
+    font-size:12px;color:var(--text-dim);background:var(--bg-elev);border:1px solid var(--border);
+    padding:9px 16px;border-radius:20px;cursor:pointer;transition:.15s;
+  }
+  .btn:hover{border-color:var(--border-glow);color:var(--cyan);}
+  .btn.on{border-color:var(--cyan);color:var(--cyan);}
+
+  .transcript{
+    flex:1;background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px;margin-top:16px;overflow-y:auto;max-height:44vh;min-height:180px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .msg{display:flex;flex-direction:column;max-width:82%;font-size:13.5px;line-height:1.5;}
+  .msg.user{align-self:flex-end;align-items:flex-end;}
+  .msg.jarvis{align-self:flex-start;align-items:flex-start;}
+  .msg .bubble{padding:9px 13px;border-radius:14px;white-space:pre-wrap;}
+  .msg.user .bubble{background:rgba(61,220,255,.14);border:1px solid rgba(61,220,255,.3);border-bottom-right-radius:4px;}
+  .msg.jarvis .bubble{background:var(--bg-elev);border:1px solid var(--border);border-bottom-left-radius:4px;}
+  .msg .who{font-size:10px;color:var(--text-faint);margin:0 4px 3px;text-transform:uppercase;letter-spacing:.05em;}
+  .empty-hint{color:var(--text-faint);font-size:12.5px;text-align:center;margin:auto;padding:20px;}
+
+  .composer{display:flex;gap:8px;margin-top:12px;}
+  .composer input{
+    flex:1;background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;color:var(--text);
+    padding:12px 14px;font-size:13.5px;font-family:inherit;
+  }
+  .composer input:focus{outline:none;border-color:var(--border-glow);}
+  .composer button{
+    background:var(--cyan);border:none;color:#04141c;font-weight:700;border-radius:12px;
+    padding:0 16px;cursor:pointer;font-size:13px;
+  }
+  .composer button:hover{filter:brightness(1.08);}
+  .composer button:disabled{opacity:.5;cursor:not-allowed;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <h1>JARVIS</h1>
+        <div class="sub">Copiloto operativo</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="banner" id="unsupportedBanner">Tu navegador no soporta reconocimiento de voz (usa Chrome o Edge). Puedes seguir escribiéndome ahí abajo.</div>
+  <div class="banner err" id="errorBanner"></div>
+
+  <div class="orb-zone">
+    <div class="orb" id="orb">
+      <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-2.08A7 7 0 0019 12h-2z"/></svg>
+    </div>
+    <div class="orb-status" id="orbStatus">Pulsa el círculo para hablar</div>
+  </div>
+
+  <div class="clapzone">
+    <button class="btn" id="btnPalmas">👏 Activar palmas</button>
+  </div>
+
+  <div class="transcript" id="transcript">
+    <div class="empty-hint" id="emptyHint">Habla, da dos palmadas, o escribe algo abajo para empezar.</div>
+  </div>
+
+  <div class="composer">
+    <input type="text" id="textInput" placeholder="Escríbeme si no quieres hablar..." autocomplete="off">
+    <button id="btnSend">Enviar</button>
+  </div>
+</div>
+
+<audio id="audioPlayer" style="display:none;"></audio>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Ajustes de las palmadas (editables) ----------
+  var vigilarPalmas = 0.28;   // umbral de volumen (0 a 1) para que un pico cuente como palmada. Súbelo si se dispara solo; bájalo si te ignora.
+  var margenPalmas = 0.9;     // segundos máximo entre la primera y la segunda palmada.
+
+  // ---------- ESTADO ----------
+  var STATE = { IDLE: "idle", LISTENING: "listening", THINKING: "thinking", SPEAKING: "speaking" };
+  var state = STATE.IDLE;
+
+  var orb = document.getElementById("orb");
+  var orbStatus = document.getElementById("orbStatus");
+  var transcriptEl = document.getElementById("transcript");
+  var emptyHint = document.getElementById("emptyHint");
+  var errorBanner = document.getElementById("errorBanner");
+  var audioPlayer = document.getElementById("audioPlayer");
+
+  function setState(next, statusText){
+    state = next;
+    orb.classList.remove("listening", "speaking", "thinking");
+    if(next !== STATE.IDLE) orb.classList.add(next === STATE.LISTENING ? "listening" : (next === STATE.SPEAKING ? "speaking" : "thinking"));
+    orbStatus.textContent = statusText;
+  }
+
+  function showError(msg){
+    errorBanner.textContent = msg;
+    errorBanner.classList.add("show");
+    setTimeout(function(){ errorBanner.classList.remove("show"); }, 8000);
+  }
+
+  function addMessage(who, text){
+    if(emptyHint){ emptyHint.remove(); emptyHint = null; }
+    var wrap = document.createElement("div");
+    wrap.className = "msg " + (who === "user" ? "user" : "jarvis");
+    var label = document.createElement("div");
+    label.className = "who";
+    label.textContent = who === "user" ? "Tú" : "Jarvis";
+    var bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    wrap.appendChild(label);
+    wrap.appendChild(bubble);
+    transcriptEl.appendChild(wrap);
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  }
+
+  // ---------- ENVIAR AL SERVIDOR (Claude + ElevenLabs) ----------
+  function sendToJarvis(userText){
+    addMessage("user", userText);
+    setState(STATE.THINKING, "Pensando…");
+    fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text: userText })
+    }).then(function(res){
+      return res.json().then(function(data){
+        if(!res.ok) throw new Error(data.error || ("HTTP " + res.status));
+        return data;
+      });
+    }).then(function(data){
+      addMessage("jarvis", data.text);
+      playAudio(data.audio);
+    }).catch(function(err){
+      setState(STATE.IDLE, "Pulsa el círculo para hablar");
+      showError("No he podido hablar con el servidor: " + err.message);
+      reanudarEscuchaPalmas();
+    });
+  }
+
+  function playAudio(base64Mp3){
+    audioPlayer.src = "data:audio/mpeg;base64," + base64Mp3;
+    setState(STATE.SPEAKING, "Hablando…");
+    var playPromise = audioPlayer.play();
+    if(playPromise && playPromise.catch){
+      playPromise.catch(function(err){
+        setState(STATE.IDLE, "Pulsa el círculo para hablar");
+        showError("El navegador ha bloqueado el audio. Pulsa Enviar una vez con el ratón para desbloquearlo.");
+        reanudarEscuchaPalmas();
+      });
+    }
+  }
+  audioPlayer.addEventListener("ended", function(){
+    setState(STATE.IDLE, "Pulsa el círculo para hablar");
+    reanudarEscuchaPalmas();
+  });
+
+  // ---------- RECONOCIMIENTO DE VOZ (STT del navegador) ----------
+  var SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recognition = null;
+  if(SpeechRecognitionCtor){
+    recognition = new SpeechRecognitionCtor();
+    recognition.lang = "es-ES";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function(){ setState(STATE.LISTENING, "Escuchando…"); pausarEscuchaPalmas(); };
+    recognition.onerror = function(e){
+      if(e.error === "not-allowed" || e.error === "service-not-allowed"){
+        showError("No he podido acceder al micrófono. Revisa los permisos del navegador.");
+      }
+      setState(STATE.IDLE, "Pulsa el círculo para hablar");
+      reanudarEscuchaPalmas();
+    };
+    recognition.onend = function(){
+      if(state === STATE.LISTENING) setState(STATE.IDLE, "Pulsa el círculo para hablar");
+    };
+    recognition.onresult = function(e){
+      var text = e.results[0][0].transcript;
+      sendToJarvis(text);
+    };
+  } else {
+    document.getElementById("unsupportedBanner").classList.add("show");
+  }
+
+  function startListening(){
+    if(!recognition || state !== STATE.IDLE) return;
+    try{ recognition.start(); }catch(e){}
+  }
+
+  orb.addEventListener("click", function(){
+    if(!recognition) return;
+    if(state === STATE.LISTENING){ recognition.stop(); return; }
+    if(state === STATE.IDLE) startListening();
+  });
+
+  // ---------- ENTRADA DE TEXTO ----------
+  var textInput = document.getElementById("textInput");
+  document.getElementById("btnSend").addEventListener("click", sendTextInput);
+  textInput.addEventListener("keydown", function(e){ if(e.key === "Enter") sendTextInput(); });
+  function sendTextInput(){
+    var val = textInput.value.trim();
+    if(!val || state !== STATE.IDLE) return;
+    textInput.value = "";
+    sendToJarvis(val);
+  }
+
+  // ---------- DETECCIÓN DE DOS PALMADAS ----------
+  var audioCtx = null, analyser = null, dataArray = null, rafId = null;
+  var wasAboveThreshold = false;
+  var lastPeakTime = 0;
+  var firstClapTime = null;
+  var palmasActivas = false;
+  var micStream = null;
+
+  document.getElementById("btnPalmas").addEventListener("click", function(){
+    if(palmasActivas){
+      pausarEscuchaPalmas(true);
+      palmasActivas = false;
+      this.classList.remove("on");
+      this.textContent = "👏 Activar palmas";
+      return;
+    }
+    var btn = this;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+      micStream = stream;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var source = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      dataArray = new Uint8Array(analyser.fftSize);
+      source.connect(analyser);
+      palmasActivas = true;
+      btn.classList.add("on");
+      btn.textContent = "👏 Palmas activas";
+      reanudarEscuchaPalmas();
+    }).catch(function(err){
+      showError("No he podido acceder al micrófono para las palmas: " + err.message);
+    });
+  });
+
+  function getVolume(){
+    analyser.getByteTimeDomainData(dataArray);
+    var sum = 0;
+    for(var i = 0; i < dataArray.length; i++){
+      var v = (dataArray[i] - 128) / 128;
+      sum += v * v;
+    }
+    return Math.sqrt(sum / dataArray.length);
+  }
+
+  function loopPalmas(){
+    rafId = requestAnimationFrame(loopPalmas);
+    if(!analyser || state !== STATE.IDLE) return;
+    var vol = getVolume();
+    var above = vol > vigilarPalmas;
+    var now = performance.now() / 1000;
+    if(above && !wasAboveThreshold && (now - lastPeakTime) > 0.15){
+      lastPeakTime = now;
+      registrarPalmada(now);
+    }
+    wasAboveThreshold = above;
+  }
+
+  function registrarPalmada(now){
+    if(firstClapTime !== null && (now - firstClapTime) <= margenPalmas){
+      firstClapTime = null;
+      startListening();
+    } else {
+      firstClapTime = now;
+    }
+  }
+
+  function reanudarEscuchaPalmas(){
+    if(!palmasActivas || rafId) return;
+    wasAboveThreshold = false;
+    firstClapTime = null;
+    loopPalmas();
+  }
+  function pausarEscuchaPalmas(detener){
+    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+    if(detener && micStream){
+      micStream.getTracks().forEach(function(t){ t.stop(); });
+      if(audioCtx) audioCtx.close();
+      analyser = null; audioCtx = null; micStream = null;
+    }
+  }
+})();
+</script>
+</body>
+</html>

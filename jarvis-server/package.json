@@ -1,0 +1,12 @@
+{
+  "name": "jarvis-server",
+  "version": "1.0.0",
+  "description": "JARVIS: servidor Node (sin dependencias) que conecta un frontend de voz con Claude y ElevenLabs.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
